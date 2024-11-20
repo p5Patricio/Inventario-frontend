@@ -19,22 +19,22 @@ export default {
   },
   data() {
     return {
-      tiendas: [],
+      proveedores: [],
     };
   },
   methods: {
-    async listartiendas() {
+    async listarproveedores() {
       try {
-        const response = await axios.get('tienda/list');
-        this.tiendas = response.data;
-        console.log(this.tiendas)
+        const response = await axios.get('proveedor/list');
+        this.proveedores = response.data;
+        console.log(this.proveedores)
       } catch (error) {
         console.error('Hubo un error al obtener los datos:', error);
       }
     },
   },
   mounted() {
-    this.listartiendas();
+    this.listarproveedores();
   },
 };
 </script>
