@@ -3,7 +3,11 @@
       <div :class="['barra-lateral', { 'barra-oculta': isHidden }]">
         <ul>
           <li><router-link to="/">Home</router-link></li>
-          <li><router-link to="/Inventario">Inventario</router-link></li>
+          <li><router-link to="/dashboard">Dashboard</router-link></li>
+          <li><router-link to="/inventario">Inventario</router-link></li>
+          <li><router-link to="/reportes">Reportes</router-link></li>
+          <li><router-link to="/proveedores">Proveedores</router-link></li>
+          <li><router-link to="/ordenes">Ordenes</router-link></li>
           <li><router-link to="/tiendas">Tiendas</router-link></li>
         </ul>
       </div>
