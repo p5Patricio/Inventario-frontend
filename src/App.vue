@@ -1,30 +1,48 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view/>
+  <div id="app">
+    <!-- Contenido principal -->
+    <div class="content">
+      <nav>
+        <router-link to="/">Home</router-link> |
+        <router-link to="/about">About</router-link> |
+        <router-link to="/tiendas">Tiendas</router-link>
+      </nav>
+      <router-view />
+    </div>
+  </div>
 </template>
+
+<script>
+
+export default {
+};
+</script>
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+  display: flex;
+  height: 100vh;
+}
+
+.content {
+  margin-left: 250px;
+  padding: 20px;
+  width: calc(100% - 250px); /* Ajusta el ancho para compensar la barra lateral */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centra horizontalmente */
+  text-align: center; /* Centra el texto */
 }
 
 nav {
-  padding: 30px;
+  text-align: center; /* Centra los enlaces de navegación */
+  margin-bottom: 20px;
 }
 
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-nav a.router-link-exact-active {
-  color: #42b983;
+router-view {
+  width: 100%; /* Ocupa todo el ancho disponible */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>
