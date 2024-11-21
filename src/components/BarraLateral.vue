@@ -1,6 +1,6 @@
 <template>
     <div>
-      <div :class="['barra-lateral', { 'barra-oculta': isHidden }]">
+      <div class="barra-lateral">
         <ul>
           <li><router-link to="/">Home</router-link></li>
           <li><router-link to="/dashboard">Dashboard</router-link></li>
