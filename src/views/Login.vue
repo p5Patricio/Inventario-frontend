@@ -6,7 +6,6 @@
   </template>
   
   <script>
-  //import axios from 'axios';
   import FormLogin from "@/components/FormLogin.vue";
     
   export default {

@@ -44,25 +44,27 @@
       };
     },
     methods: {
-      async handleLogin() {
-        try {
-          // Petición al endpoint de login
-          const response = await axios.post("/usuario/login", {
-            usuario: this.form.usuario,
-            password: this.form.password,
-          });
-          const { token, usuario } = response.data;
-          localStorage.setItem("token", token); 
-          localStorage.setItem("token", usuario); 
-          this.$router.push("/dashboard"); 
-        } catch (error) {
-          if (error.response && error.response.data) {
-            this.errorMessage = error.response.data.error;
-          } else {
-            this.errorMessage = "Ocurrió un error inesperado";
-          }
-        }
-      },
+        async handleLogin() {
+            try {
+                const response = await axios.post("/usuario/login", {
+                usuario: this.form.usuario,
+                password: this.form.password,
+                });
+                const { token } = response.data;
+                const usuario = response.data.user.usuario;
+                const id = response.data.user.id;
+                localStorage.setItem("token", token);
+                localStorage.setItem("usuario", JSON.stringify(usuario));
+                localStorage.setItem("id", JSON.stringify(id));
+                this.$router.push("/dashboard"); 
+            } catch (error) {
+                if (error.response && error.response.data) {
+                this.errorMessage = error.response.data.error;
+                } else {
+                this.errorMessage = "Ocurrió un error inesperado";
+                }
+            }
+        }, 
     },
   };
   </script>

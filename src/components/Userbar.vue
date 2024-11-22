@@ -3,7 +3,7 @@
     <div>
       <!-- Barra de usuario -->
       <div class="user-bar">
-        <span @click="openUserDialog" class="user-name">{{ user.nombre || "Usuario" }}</span>
+        <span @click="openUserDialog" class="user-name">{{ nombreusuario || "Usuario" }}</span>
         <span class="user-icon">👤</span>
       </div>
   
@@ -54,22 +54,16 @@
     data() {
       return {
         showDialog: false,
-        user: {
-          nombre: "",
-          apellido_pat: "",
-          apellido_mat: "",
-          email: "",
-        },
+        nombreusuario: "", 
         editableUser: {},
       };
     },
     created() {
-      // Obtener información del usuario al cargar el componente
-      const usuario = JSON.parse(localStorage.getItem("usuario"));
-      if (usuario) {
-        this.user = usuario;
-        this.editableUser = { ...usuario };
-      }
+    const storedUser = localStorage.getItem("usuario");
+    console.log("Valor en localStorage del usuario:", storedUser);
+    this.nombreusuario = storedUser; 
+    const storedid = localStorage.getItem("id");
+    console.log("Valor en localStorage del id :", storedid);
     },
     methods: {
       openUserDialog() {
