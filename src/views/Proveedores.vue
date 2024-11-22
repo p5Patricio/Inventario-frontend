@@ -1,6 +1,7 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
     <div class="layout">
+      <Userbar/>
       <BarraLateral/>
       <div class="contenido-principal">
         <h1>Pagina para los proveedores</h1>
@@ -12,9 +13,11 @@
 <script>
 import axios from 'axios';
 import BarraLateral from "../components/BarraLateral.vue";
+import Userbar from '@/components/Userbar.vue';
   
 export default {
   components: {
+    Userbar, 
     BarraLateral,
   },
   data() {

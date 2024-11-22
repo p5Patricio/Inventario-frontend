@@ -1,6 +1,7 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <div class="layout">
+    <Userbar/>
     <BarraLateral />
     <div class="contenido-principal">
       <h1>Proveedores</h1>
@@ -41,10 +42,12 @@
 </template>
 
 <script>
+import Userbar from "@/components/Userbar.vue";
 import BarraLateral from "../components/BarraLateral.vue";
 
 export default {
   components: {
+    Userbar,
     BarraLateral,
   },
   data() {
