@@ -2,10 +2,6 @@
   <div id="app">
     <!-- Contenido principal -->
     <div class="content">
-      <nav>
-        <router-link to="/">Home</router-link> |
-        <router-link to="/tiendas">Tiendas</router-link>
-      </nav>
       <router-view />
     </div>
   </div>

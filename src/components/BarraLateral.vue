@@ -1,20 +1,58 @@
 <template>
-  <div>
-    <div class="barra-lateral">
-      <ul>
-        <li><router-link to="/dashboard">Dashboard</router-link></li>
-        <li><router-link to="/inventario">Inventario</router-link></li>
-        <li><router-link to="/reportes">Reportes</router-link></li>
-        <li><router-link to="/proveedores">Proveedores</router-link></li>
-        <li><router-link to="/ordenes">Ordenes</router-link></li>
-        <li><router-link to="/tiendas">Tiendas</router-link></li>
-      </ul>
-      <!-- Botón de Salir -->
-      <div class="salir">
-        <button @click="logout">
-          <span class="icono">🚪</span> Salir
-        </button>
-      </div>
+  <div class="barra-lateral">
+    <!-- Logo -->
+    <div class="logo">
+      <span class="logo-text">KANBAN</span>
+    </div>
+    
+    <ul>
+      <li>
+        <router-link to="/dashboard">
+          <span class="icon">📊</span>
+          Dashboard
+        </router-link>
+      </li>
+      <li>
+        <router-link to="/inventario">
+          <span class="icon">📦</span>
+          Inventory
+        </router-link>
+      </li>
+      <li>
+        <router-link to="/reportes">
+          <span class="icon">📈</span>
+          Reports
+        </router-link>
+      </li>
+      <li>
+        <router-link to="/proveedores">
+          <span class="icon">🤝</span>
+          Suppliers
+        </router-link>
+      </li>
+      <li>
+        <router-link to="/ordenes">
+          <span class="icon">📝</span>
+          Orders
+        </router-link>
+      </li>
+      <li>
+        <router-link to="/tiendas">
+          <span class="icon">🏪</span>
+          Manage Store
+        </router-link>
+      </li>
+    </ul>
+
+    <div class="settings-section">
+      <router-link to="/settings" class="settings-link">
+        <span class="icon">⚙️</span>
+        Settings
+      </router-link>
+      <button @click="logout" class="logout-btn">
+        <span class="icon">🚪</span>
+        Log Out
+      </button>
     </div>
   </div>
 </template>
@@ -33,80 +71,101 @@ export default {
   
 <style scoped>
 .barra-lateral {
-  width: 230px;
-  background-color: white;
-  color: #2c3e50;
+  width: 300px;
   height: 100vh;
+  background: white;
+  color: white;
+  padding: 10px;
   position: fixed;
-  left: 0;
   top: 0;
-  padding: 20px;
-  border-right: 1px solid #e0e0e0;
-  box-shadow: 5px 0 5px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column; /* Para alinear los elementos verticalmente */
-  justify-content: space-between; /* Espaciado entre elementos */
+  left: 0;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Sombra restaurada */
 }
-
 .barra-lateral ul {
   list-style: none;
   padding: 0;
-  margin: 0;
-  width: 100%;
-  margin-top: 40px;
 }
 
 .barra-lateral li {
-  margin: 15px 0;
-  text-align: center;
+  margin: 20px 0;
+  font-size: 18px;
+  color: #fff;
 }
 
-.barra-lateral a {
-  display: block;
-  padding: 15px 20px;
-  text-decoration: none;
-  color: #2c3e50;
-  font-size: 1.1rem;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  background-color: #f8f9fa;
-  margin: 0 10px;
-}
-
-.barra-lateral a:hover {
-  background-color: #42b983;
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Estilo del botón "Salir" */
-.salir {
-  margin-top: auto; /* Empuja el botón hacia abajo */
-  text-align: center;
-}
-
-.salir button {
-  background-color: #e74c3c;
-  color: white;
-  padding: 10px 20px;
-  margin-bottom: 50px;
-  width: 100%;
-  font-size: 1rem;
-  border: none;
-  border-radius: 8px;
+.barra-lateral li:hover {
+  background-color: #ffffff30; /* Fondo al pasar el mouse */
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  border-radius: 8px;
+}
+
+.layout {
+  margin-left: 300px; /* Espacio para la barra lateral fija */
+}
+
+.logo {
+  padding: 20px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #0066ff;
+}
+
+ul {
+  list-style: none;
+  padding: 20px 0;
+  margin: 0;
+}
+
+li {
+  margin: 4px 0;
+  font-size: 18px;
+  align-items: center;
+}
+
+.icon {
+  margin-right: 10px;
+}
+
+a {
   display: flex;
   align-items: center;
-  justify-content: center;
+  padding: 12px 20px;
+  text-decoration: none;
+  color: #666;
+  transition: all 0.3s ease;
 }
 
-.salir button .icono {
-  margin-right: 8px; /* Espacio entre icono y texto */
+a:hover, a.router-link-active {
+  background-color: #f0f0f0;
+  color: #0066ff;
 }
 
-.salir button:hover {
-  background-color: #c0392b;
+.settings-section {
+  margin-top: auto;
+  font-size: 18px;
+  padding-top: 120px;
+}
+
+.settings-link {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.logout-btn {
+  width: 100%;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  border: none;
+  background: none;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+  background-color: #f0f0f0;
+  color: #0066ff;
 }
 </style>
