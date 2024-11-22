@@ -14,14 +14,14 @@
           <form @submit.prevent="updateUser">
             <div>
               <label for="nombre">Nombre:</label>
-              <input type="text" id="nombre" v-model="editableUser.nombre" />
+              <input type="text" id="nombre" v-model="editableUser.usuario.nombre" />
             </div>
             <div>
               <label for="apellido_pat">Apellido Paterno:</label>
               <input
                 type="text"
                 id="apellido_pat"
-                v-model="editableUser.apellido_pat"
+                v-model="editableUser.usuario.apellido_pat"
               />
             </div>
             <div>
@@ -29,12 +29,20 @@
               <input
                 type="text"
                 id="apellido_mat"
-                v-model="editableUser.apellido_mat"
+                v-model="editableUser.usuario.apellido_mat"
+              />
+            </div>
+            <div>
+              <label for="usuario">Usuario:</label>
+              <input
+                type="text"
+                id="usuario"
+                v-model="editableUser.usuario.usuario"
               />
             </div>
             <div>
               <label for="email">Correo Electrónico:</label>
-              <input type="email" id="email" v-model="editableUser.email" />
+              <input type="email" id="email" v-model="editableUser.usuario.email" />
             </div>
             <button type="submit">Guardar Cambios</button>
             <button type="button" @click="deleteUser" class="delete-btn">
@@ -60,41 +68,58 @@
     },
     created() {
     const storedUser = localStorage.getItem("usuario");
-    console.log("Valor en localStorage del usuario:", storedUser);
-    this.nombreusuario = storedUser; 
-    const storedid = localStorage.getItem("id");
-    console.log("Valor en localStorage del id :", storedid);
-    },
-    methods: {
-      openUserDialog() {
+    //console.log("Valor en localStorage del usuario:", storedUser);
+    this.nombreusuario = storedUser;
+  },
+  methods: {
+    async openUserDialog() {
+      try {
+        const token = localStorage.getItem("token");
+        const userId = localStorage.getItem("id").replace(/^"|"$/g, '');
+        
+        const response = await axios.get(`/usuario/getbyId/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        this.editableUser = response.data;
+        console.log(this.editableUser)
+        
         this.showDialog = true;
-      },
+      } catch (error) {
+        console.error("Error al obtener datos del usuario:", error);
+        alert("No se pudieron cargar los datos del usuario");
+      }
+    },
       closeUserDialog() {
         this.showDialog = false;
       },
       async updateUser() {
         try {
           const token = localStorage.getItem("token");
-          await axios.put(`/usuario/${this.user.id}`, this.editableUser, {
+          // eslint-disable-next-line no-unused-vars
+          const { password, ...userToUpdate } = this.editableUser.usuario;
+          
+          await axios.put(`/usuario/update/${userToUpdate.id}`, userToUpdate, {
             headers: { Authorization: `Bearer ${token}` },
           });
-          this.user = { ...this.editableUser }; // Actualizar información local
+          
           alert("Información actualizada correctamente");
           this.closeUserDialog();
         } catch (error) {
           console.error("Error al actualizar usuario:", error);
           alert("No se pudo actualizar la información");
         }
-      },
+      }, 
       async deleteUser() {
         if (confirm("¿Estás seguro de que deseas eliminar tu usuario?")) {
           try {
+            const userId = localStorage.getItem("id").replace(/^"|"$/g, '');
             const token = localStorage.getItem("token");
-            await axios.delete(`/usuario/${this.user.id}`, {
+            await axios.delete(`/usuario/delete/${userId}`, {
               headers: { Authorization: `Bearer ${token}` },
             });
-            localStorage.clear(); // Limpiar datos locales
-            this.$router.push("/signup"); // Redirigir tras eliminar usuario
+            localStorage.clear();
+            this.$router.push("/signup");
           } catch (error) {
             console.error("Error al eliminar usuario:", error);
             alert("No se pudo eliminar el usuario");
