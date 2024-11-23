@@ -69,9 +69,11 @@
       };
     },
     created() {
-    const storedUser = localStorage.getItem("usuario").replace(/^"|"$/g, ''); 
+       const storedUser = localStorage.getItem("usuario");
+      this.nombreusuario = storedUser ? storedUser.replace(/^"|"$/g, '') : "Usuario";
+    //const storedUser = localStorage.getItem("usuario").replace(/^"|"$/g, ''); 
     //console.log("Valor en localStorage del usuario:", storedUser);
-    this.nombreusuario = storedUser;
+    //this.nombreusuario = storedUser;
   },
   methods: {
     async openUserDialog() {
