@@ -45,10 +45,6 @@
     </ul>
 
     <div class="settings-section">
-      <router-link to="/settings" class="settings-link">
-        <span class="icon">⚙️</span>
-        Settings
-      </router-link>
       <button @click="logout" class="logout-btn">
         <span class="icon">🚪</span>
         Log Out
@@ -162,6 +158,7 @@ a:hover, a.router-link-active {
   color: #666;
   cursor: pointer;
   transition: all 0.3s ease;
+  margin-top: 30px;
 }
 
 .logout-btn:hover {
