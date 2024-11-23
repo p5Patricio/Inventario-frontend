@@ -1,4 +1,5 @@
 <!-- eslint-disable vue/multi-word-component-names -->
+<!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <div class="layout">
     <Userbar />
@@ -19,7 +20,7 @@
         Agregar Producto
       </button>
       <!-- Tabla de productos -->
-      <div class="product-table">
+      <div class="product-table" v-if="!showProductDetails">
         <table>
           <thead>
             <tr>
@@ -32,17 +33,24 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="item in filteredProducts" :key="item.id">
+            <tr
+              v-for="item in filteredProducts"
+              :key="item.id"
+              @click="selectProduct(item)"
+              style="cursor: pointer;"
+            >
               <td>{{ item.nombre }}</td>
               <td>${{ item.precioCompra }}</td>
               <td>{{ item.cantidad }}</td>
               <td>{{ item.valorUmbral }}</td>
               <td>{{ item.fechaVencimiento || "N/A" }}</td>
-              <td :class="{
-                'in-stock': item.estadoDisponibilidad === 'En existencia',
-                'out-of-stock': item.estadoDisponibilidad === 'Agotado',
-                'low-stock': item.estadoDisponibilidad === 'Bajo stock'
-              }">
+              <td
+                :class="{
+                  'in-stock': item.estadoDisponibilidad === 'En existencia',
+                  'out-of-stock': item.estadoDisponibilidad === 'Agotado',
+                  'low-stock': item.estadoDisponibilidad === 'Bajo stock',
+                }"
+              >
                 {{ item.estadoDisponibilidad }}
               </td>
             </tr>
@@ -56,7 +64,12 @@
           <form @submit.prevent="submitNewProduct">
             <div>
               <label for="imagenUrl">URL de la Imagen:</label>
-              <input type="text" id="imagenUrl" v-model="newProduct.imagenUrl" placeholder="Ingrese URL de la imagen" />
+              <input
+                type="text"
+                id="imagenUrl"
+                v-model="newProduct.imagenUrl"
+                placeholder="Ingrese URL de la imagen"
+              />
             </div>
             <div>
               <label for="nombre">Nombre del Producto:</label>
@@ -93,6 +106,12 @@
           </form>
         </div>
       </div>
+      <!-- Detalles del producto -->
+      <ProductDetails
+        v-if="showProductDetails"
+        :product="selectedProduct"
+        @close="closeProductDetails"
+      />
     </div>
   </div>
 </template>
@@ -101,17 +120,21 @@
 import axios from "axios";
 import BarraLateral from "../components/BarraLateral.vue";
 import Userbar from "@/components/Userbar.vue";
+import ProductDetails from "@/components/ProductDetails.vue";
 
 export default {
   components: {
     Userbar,
     BarraLateral,
+    ProductDetails,
   },
   data() {
     return {
       inventario: [],
       searchTerm: "",
       showAddProductDialog: false,
+      showProductDetails: false,
+      selectedProduct: null, // Producto seleccionado
       newProduct: {
         imagenUrl: "",
         nombre: "",
@@ -144,22 +167,13 @@ export default {
           cantidad: doc.cantidad || 0,
           valorUmbral: doc.valorUmbral || 0,
           fechaVencimiento: doc.fechaVencimiento || null,
-          estadoDisponibilidad: this.traducirEstado(doc.estadoDisponibilidad || "N/A"),
+          estadoDisponibilidad: doc.estadoDisponibilidad || "N/A",
+          imagenUrl: doc.imagenUrl || "",
+          nombreProveedor: doc.nombreProveedor || "",
+          contactoProveedor: doc.contactoProveedor || "",
         }));
       } catch (error) {
         console.error("Hubo un error al obtener los datos:", error);
-      }
-    },
-    traducirEstado(estado) {
-      switch (estado) {
-        case "In-stock":
-          return "En existencia";
-        case "Out of stock":
-          return "Agotado";
-        case "Low stock":
-          return "Bajo stock";
-        default:
-          return estado;
       }
     },
     toggleAddProductDialog() {
@@ -184,6 +198,14 @@ export default {
       } catch (error) {
         console.error("Error al agregar el producto:", error.response?.data || error.message);
       }
+    },
+    selectProduct(product) {
+      this.selectedProduct = product;
+      this.showProductDetails = true;
+    },
+    closeProductDetails() {
+      this.selectedProduct = null;
+      this.showProductDetails = false;
     },
   },
   mounted() {
@@ -227,5 +249,10 @@ export default {
   padding: 20px;
   border-radius: 8px;
   width: 400px;
+}
+
+tbody tr:hover {
+  background-color: #f3f4f6;
+  cursor: pointer;
 }
 </style>
