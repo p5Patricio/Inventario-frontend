@@ -14,6 +14,10 @@
           @input="filterProducts"
         />
       </div>
+      <!-- Botón para agregar producto -->
+      <button class="add-product-btn" @click="toggleAddProductDialog">
+        Agregar Producto
+      </button>
       <!-- Tabla de productos -->
       <div class="product-table">
         <table>
@@ -34,12 +38,60 @@
               <td>{{ item.cantidad }}</td>
               <td>{{ item.valorUmbral }}</td>
               <td>{{ item.fechaVencimiento || "N/A" }}</td>
-              <td :class="{'in-stock': item.estadoDisponibilidad === 'En existencia', 'out-of-stock': item.estadoDisponibilidad === 'Agotado', 'low-stock': item.estadoDisponibilidad === 'Bajo stock'}">
+              <td :class="{
+                'in-stock': item.estadoDisponibilidad === 'En existencia',
+                'out-of-stock': item.estadoDisponibilidad === 'Agotado',
+                'low-stock': item.estadoDisponibilidad === 'Bajo stock'
+              }">
                 {{ item.estadoDisponibilidad }}
               </td>
             </tr>
           </tbody>
         </table>
+      </div>
+      <!-- Modal para agregar producto -->
+      <div v-if="showAddProductDialog" class="modal-overlay">
+        <div class="modal">
+          <h2>Agregar Producto</h2>
+          <form @submit.prevent="submitNewProduct">
+            <div>
+              <label for="imagenUrl">URL de la Imagen:</label>
+              <input type="text" id="imagenUrl" v-model="newProduct.imagenUrl" placeholder="Ingrese URL de la imagen" />
+            </div>
+            <div>
+              <label for="nombre">Nombre del Producto:</label>
+              <input type="text" id="nombre" v-model="newProduct.nombre" required />
+            </div>
+            <div>
+              <label for="categoria">Categoría:</label>
+              <input type="text" id="categoria" v-model="newProduct.categoria" required />
+            </div>
+            <div>
+              <label for="precioCompra">Precio de Compra:</label>
+              <input type="number" id="precioCompra" v-model="newProduct.precioCompra" required />
+            </div>
+            <div>
+              <label for="cantidad">Cantidad:</label>
+              <input type="number" id="cantidad" v-model="newProduct.cantidad" required />
+            </div>
+            <div>
+              <label for="unidad">Unidad:</label>
+              <input type="text" id="unidad" v-model="newProduct.unidad" required />
+            </div>
+            <div>
+              <label for="fechaVencimiento">Fecha de Caducidad:</label>
+              <input type="date" id="fechaVencimiento" v-model="newProduct.fechaVencimiento" />
+            </div>
+            <div>
+              <label for="valorUmbral">Umbral:</label>
+              <input type="number" id="valorUmbral" v-model="newProduct.valorUmbral" required />
+            </div>
+            <div class="modal-actions">
+              <button type="submit">Agregar Producto</button>
+              <button type="button" @click="toggleAddProductDialog">Cancelar</button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>
@@ -59,6 +111,17 @@ export default {
     return {
       inventario: [],
       searchTerm: "",
+      showAddProductDialog: false,
+      newProduct: {
+        imagenUrl: "",
+        nombre: "",
+        categoria: "",
+        precioCompra: 0,
+        cantidad: 0,
+        unidad: "",
+        fechaVencimiento: "",
+        valorUmbral: 0,
+      },
     };
   },
   computed: {
@@ -73,7 +136,7 @@ export default {
   methods: {
     async listarinventario() {
       try {
-        const response = await axios.get("productos/");
+        const response = await axios.get("http://localhost:3000/api/productos");
         this.inventario = response.data.map((doc) => ({
           id: doc.id,
           nombre: doc.nombre || "Sin nombre",
@@ -99,6 +162,29 @@ export default {
           return estado;
       }
     },
+    toggleAddProductDialog() {
+      this.showAddProductDialog = !this.showAddProductDialog;
+    },
+    async submitNewProduct() {
+      try {
+        const response = await axios.post("http://localhost:3000/api/productos", this.newProduct);
+        this.inventario.push(response.data); // Agregar a la lista actual
+        this.toggleAddProductDialog(); // Cerrar el modal
+        this.newProduct = {
+          imagenUrl: "",
+          nombre: "",
+          categoria: "",
+          precioCompra: 0,
+          cantidad: 0,
+          unidad: "",
+          fechaVencimiento: "",
+          valorUmbral: 0,
+        }; // Limpiar el formulario
+        await this.listarinventario(); // Actualizar la lista
+      } catch (error) {
+        console.error("Error al agregar el producto:", error.response?.data || error.message);
+      }
+    },
   },
   mounted() {
     this.listarinventario();
@@ -107,6 +193,7 @@ export default {
 </script>
 
 <style scoped>
+/* Ajustar diseño */
 .layout {
   display: flex;
   min-height: 100vh;
@@ -116,69 +203,29 @@ export default {
   flex: 1;
   margin-left: 230px;
   padding: 20px;
+}
+
+.search-bar input,
+.add-product-btn {
+  margin-bottom: 20px;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
-  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
-h1 {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.search-bar input {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 20px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-  background: #fff;
+.modal {
+  background: white;
+  padding: 20px;
   border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-thead {
-  background-color: #f9fafb;
-}
-
-th, td {
-  padding: 12px;
-  text-align: left;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-th {
-  font-weight: bold;
-  font-size: 14px;
-  color: #374151;
-}
-
-td {
-  font-size: 14px;
-  color: #4b5563;
-}
-
-.in-stock {
-  color: green;
-}
-
-.out-of-stock {
-  color: red;
-}
-
-.low-stock {
-  color: orange;
-}
-
-tbody tr:hover {
-  background-color: #f3f4f6;
+  width: 400px;
 }
 </style>
