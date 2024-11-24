@@ -14,33 +14,31 @@
       <div class="dialog">
         <h3>Información del Usuario</h3>
         <form @submit.prevent="updateUser">
+          <!-- Mostrar imagen actual si existe -->
+          <div v-if="editableUser.usuario.profileImage">
+            <label>Foto de perfil actual:</label>
+            <!-- Concatenamos la URL base del backend con la ruta de la imagen -->
+            <img :src="getFullImageUrl(editableUser.usuario.profileImage)" alt="Imagen de perfil" class="profile-image-preview" />
+          </div>
+          <div>
+            <label for="profileImage">Cambiar Foto de perfil:</label>
+            <input type="file" id="profileImage" @change="onFileChange" />
+          </div>
           <div>
             <label for="nombre">Nombre:</label>
             <input type="text" id="nombre" v-model="editableUser.usuario.nombre" />
           </div>
           <div>
             <label for="apellido_pat">Apellido Paterno:</label>
-            <input
-              type="text"
-              id="apellido_pat"
-              v-model="editableUser.usuario.apellido_pat"
-            />
+            <input type="text" id="apellido_pat" v-model="editableUser.usuario.apellido_pat" />
           </div>
           <div>
             <label for="apellido_mat">Apellido Materno:</label>
-            <input
-              type="text"
-              id="apellido_mat"
-              v-model="editableUser.usuario.apellido_mat"
-            />
+            <input type="text" id="apellido_mat" v-model="editableUser.usuario.apellido_mat" />
           </div>
           <div>
             <label for="usuario">Usuario:</label>
-            <input
-              type="text"
-              id="usuario"
-              v-model="editableUser.usuario.usuario"
-            />
+            <input type="text" id="usuario" v-model="editableUser.usuario.usuario" />
           </div>
           <div>
             <label for="email">Correo Electrónico:</label>
@@ -56,24 +54,29 @@
     </div>
   </div>
 </template>
-  
-  <script>
-  import axios from "axios";
-  
-  export default {
-    data() {
-      return {
-        showDialog: false,
-        nombreusuario: "", 
-        editableUser: {},
-      };
-    },
-    created() {
-    const storedUser = localStorage.getItem("usuario").replace(/^"|"$/g, ''); 
-    //console.log("Valor en localStorage del usuario:", storedUser);
+
+<script>
+import axios from "axios";
+
+export default {
+  data() {
+    return {
+      showDialog: false,
+      nombreusuario: "",
+      editableUser: {},
+      profileImage: null,
+      // URL base de tu servidor (ajústala según el entorno de tu backend)
+      backendUrl: 'http://localhost:3000', // Cambia esto según la URL de tu backend
+    };
+  },
+  created() {
+    const storedUser = localStorage.getItem("usuario").replace(/^"|"$/g, '');
     this.nombreusuario = storedUser;
   },
   methods: {
+    onFileChange(event) {
+      this.profileImage = event.target.files[0];
+    },
     async openUserDialog() {
       try {
         const token = localStorage.getItem("token");
@@ -84,55 +87,76 @@
         });
         
         this.editableUser = response.data;
-        console.log(this.editableUser)
-        
         this.showDialog = true;
       } catch (error) {
         console.error("Error al obtener datos del usuario:", error);
         alert("No se pudieron cargar los datos del usuario");
       }
     },
-      closeUserDialog() {
-        this.showDialog = false;
-      },
-      async updateUser() {
+    closeUserDialog() {
+      this.showDialog = false;
+    },
+    getFullImageUrl(imagePath) {
+      // Concatenar la URL base del backend con la ruta de la imagen
+      return `${this.backendUrl}${imagePath}`;
+    },
+    async updateUser() {
+      try {
+        const token = localStorage.getItem("token");
+        const userId = localStorage.getItem("id").replace(/^"|"$/g, '');
+        
+        const formData = new FormData();
+        formData.append('nombre', this.editableUser.usuario.nombre);
+        formData.append('apellido_pat', this.editableUser.usuario.apellido_pat);
+        formData.append('apellido_mat', this.editableUser.usuario.apellido_mat);
+        formData.append('email', this.editableUser.usuario.email);
+        formData.append('usuario', this.editableUser.usuario.usuario);
+        
+        if (this.profileImage) {
+          formData.append('profileImage', this.profileImage);
+        }
+
+        await axios.put(`/usuario/update/${userId}`, formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
+        alert('Información actualizada correctamente');
+        this.closeUserDialog();
+      } catch (error) {
+        console.error("Error al actualizar usuario:", error);
+        alert("No se pudo actualizar la información");
+      }
+    },
+    async deleteUser() {
+      if (confirm("¿Estás seguro de que deseas eliminar tu usuario?")) {
         try {
+          const userId = localStorage.getItem("id").replace(/^"|"$/g, '');
           const token = localStorage.getItem("token");
-          // eslint-disable-next-line no-unused-vars
-          const { password, ...userToUpdate } = this.editableUser.usuario;
-          
-          await axios.put(`/usuario/update/${userToUpdate.id}`, userToUpdate, {
+          await axios.delete(`/usuario/delete/${userId}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
-          
-          alert("Información actualizada correctamente");
-          this.closeUserDialog();
+          localStorage.clear();
+          this.$router.push("/signup");
         } catch (error) {
-          console.error("Error al actualizar usuario:", error);
-          alert("No se pudo actualizar la información");
+          console.error("Error al eliminar usuario:", error);
+          alert("No se pudo eliminar el usuario");
         }
-      }, 
-      async deleteUser() {
-        if (confirm("¿Estás seguro de que deseas eliminar tu usuario?")) {
-          try {
-            const userId = localStorage.getItem("id").replace(/^"|"$/g, '');
-            const token = localStorage.getItem("token");
-            await axios.delete(`/usuario/delete/${userId}`, {
-              headers: { Authorization: `Bearer ${token}` },
-            });
-            localStorage.clear();
-            this.$router.push("/signup");
-          } catch (error) {
-            console.error("Error al eliminar usuario:", error);
-            alert("No se pudo eliminar el usuario");
-          }
-        }
-      },
+      }
     },
-  };
-  </script>
+  },
+};
+</script>
   
   <style scoped>
+  .profile-image-preview {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 50%;
+}
   .user-bar {
     width:fit-content; /* Ocupa todo el ancho */
     height: 68px; /* Más alta */
