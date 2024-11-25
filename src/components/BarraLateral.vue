@@ -45,10 +45,6 @@
     </ul>
 
     <div class="settings-section">
-      <router-link to="/settings" class="settings-link">
-        <span class="icon">⚙️</span>
-        Settings
-      </router-link>
       <button @click="logout" class="logout-btn">
         <span class="icon">🚪</span>
         Log Out
@@ -71,7 +67,7 @@ export default {
   
 <style scoped>
 .barra-lateral {
-  width: 300px;
+  width: 250px;
   height: 100vh;
   background: white;
   color: white;
@@ -88,7 +84,7 @@ export default {
 
 .barra-lateral li {
   margin: 20px 0;
-  font-size: 18px;
+  font-size: 17px;
   color: #fff;
 }
 
@@ -141,7 +137,7 @@ a:hover, a.router-link-active {
 
 .settings-section {
   margin-top: auto;
-  font-size: 18px;
+  font-size: 1px;
   padding-top: 120px;
 }
 
@@ -153,7 +149,7 @@ a:hover, a.router-link-active {
 
 .logout-btn {
   width: 100%;
-  font-size: 16px;
+  font-size: 15px;
   display: flex;
   align-items: center;
   padding: 12px 20px;
@@ -162,6 +158,7 @@ a:hover, a.router-link-active {
   color: #666;
   cursor: pointer;
   transition: all 0.3s ease;
+  margin-top: 0px;
 }
 
 .logout-btn:hover {

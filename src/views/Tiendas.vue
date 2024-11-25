@@ -9,7 +9,12 @@
       <!-- Cabecera con buscador y barra de usuario -->
       <div class="header-container">
         <div class="buscador">
-          <input type="text" placeholder="🔍 Buscar en tiendas" class="input-buscador" />
+          <input
+            type="text"
+            placeholder="🔍 Buscar en tiendas"
+            class="input-buscador"
+            v-model="searchTerm"
+          />
         </div>
         <Userbar />
       </div>
@@ -17,13 +22,13 @@
       <!-- Contenido de gestión de tiendas -->
       <div class="store-management">
         <div class="header">
-          <h2>Manage Store</h2>
-          <button class="add-store-btn" @click="addStore">Add Store</button>
+          <h1>Manage Store</h1>
+          <button class="add-store-btn" @click="toggleAddStoreDialog">Add Store</button>
         </div>
 
         <div class="stores-container">
           <div
-            v-for="tienda in tiendas"
+            v-for="tienda in filteredStores"
             :key="tienda.id"
             class="store-card"
           >
@@ -45,9 +50,84 @@
 
             <div class="edit-section">
               <button class="edit-btn" @click="editStore(tienda)">Edit</button>
+              <button class="delete-btn" @click="deleteStore(tienda.id)">Delete</button>
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Modal para agregar nueva tienda -->
+    <div v-if="showAddStoreDialog" class="modal-overlay">
+      <div class="modal">
+        <h2>Add New Store</h2>
+        <form @submit.prevent="submitNewStore">
+          <div>
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" v-model="newStore.nombre" required />
+          </div>
+          <div>
+            <label for="numero">Número:</label>
+            <input type="text" id="numero" v-model="newStore.numero" required />
+          </div>
+          <div>
+            <label for="estado">Estado:</label>
+            <input type="text" id="estado" v-model="newStore.estado" required />
+          </div>
+          <div>
+            <label for="municipio">Municipio:</label>
+            <input type="text" id="municipio" v-model="newStore.municipio" required />
+          </div>
+          <div>
+            <label for="direccion">Dirección:</label>
+            <input type="text" id="direccion" v-model="newStore.direccion" required />
+          </div>
+          <div>
+            <label for="gerente">Gerente:</label>
+            <input type="text" id="gerente" v-model="newStore.gerente" required />
+          </div>
+          <div class="modal-actions">
+            <button type="submit">Add Store</button>
+            <button type="button" @click="toggleAddStoreDialog">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal para editar tienda -->
+    <div v-if="showEditStoreDialog" class="modal-overlay">
+      <div class="modal">
+        <h2>Edit Store</h2>
+        <form @submit.prevent="submitEditStore">
+          <div>
+            <label for="edit-nombre">Nombre:</label>
+            <input type="text" id="edit-nombre" v-model="editStoreData.nombre" required />
+          </div>
+          <div>
+            <label for="edit-numero">Número:</label>
+            <input type="text" id="edit-numero" v-model="editStoreData.numero" required />
+          </div>
+          <div>
+            <label for="edit-estado">Estado:</label>
+            <input type="text" id="edit-estado" v-model="editStoreData.estado" required />
+          </div>
+          <div>
+            <label for="edit-municipio">Municipio:</label>
+            <input type="text" id="edit-municipio" v-model="editStoreData.municipio" required />
+          </div>
+          <div>
+            <label for="edit-direccion">Dirección:</label>
+            <input type="text" id="edit-direccion" v-model="editStoreData.direccion" required />
+          </div>
+          <div>
+            <label for="edit-gerente">Gerente:</label>
+            <input type="text" id="edit-gerente" v-model="editStoreData.gerente" required />
+          </div>
+          <div class="modal-actions">
+            <button type="submit">Save Changes</button>
+            <button type="button" @click="toggleEditStoreDialog">Cancel</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
@@ -66,23 +146,92 @@ export default {
   data() {
     return {
       tiendas: [],
+      showAddStoreDialog: false,
+      showEditStoreDialog: false,
+      searchTerm: "",
+      newStore: {
+        nombre: "",
+        numero: "",
+        estado: "",
+        municipio: "",
+        direccion: "",
+        gerente: "",
+      },
+      editStoreData: null,
     };
+  },
+  computed: {
+    filteredStores() {
+      // Convierte el término de búsqueda a minúsculas para comparación sin sensibilidad a mayúsculas
+      const search = this.searchTerm.toLowerCase();
+
+      // Filtra las tiendas que contengan la palabra clave en cualquiera de sus campos
+      return this.tiendas.filter((tienda) =>
+        Object.values(tienda).some((value) =>
+          String(value).toLowerCase().includes(search)
+        )
+      );
+    },
   },
   methods: {
     async listartiendas() {
       try {
         const response = await axios.get("tienda/list");
         this.tiendas = response.data;
-        console.log(this.tiendas);
       } catch (error) {
         console.error("Hubo un error al obtener los datos:", error);
       }
     },
-    addStore() {
-      console.log("Agregar nueva tienda");
+    toggleAddStoreDialog() {
+      this.showAddStoreDialog = !this.showAddStoreDialog;
+    },
+    toggleEditStoreDialog() {
+      this.showEditStoreDialog = !this.showEditStoreDialog;
     },
     editStore(tienda) {
-      console.log("Editar tienda:", tienda);
+      this.editStoreData = { ...tienda }; // Clonar datos de la tienda
+      this.showEditStoreDialog = true; // Mostrar el modal
+    },
+    async submitEditStore() {
+      try {
+        const response = await axios.put(`/tienda/update/${this.editStoreData.id}`, this.editStoreData);
+        const index = this.tiendas.findIndex((t) => t.id === this.editStoreData.id);
+        if (index !== -1) this.tiendas[index] = response.data; // Actualizar lista
+        this.toggleEditStoreDialog(); // Cerrar el modal
+      } catch (error) {
+        console.error("Error al actualizar la tienda:", error.response.data.error);
+      }
+    },
+    async submitNewStore() {
+      try {
+        const response = await axios.post("/tienda/add", this.newStore);
+        console.log("Nueva tienda agregada:", response.data);
+        this.tiendas.push(response.data); // Agregar la nueva tienda a la lista
+        this.toggleAddStoreDialog(); // Cerrar el modal
+        this.newStore = {
+          nombre: "",
+          numero: "",
+          estado: "",
+          municipio: "",
+          direccion: "",
+          gerente: "",
+        }; // Limpiar el formulario
+      } catch (error) {
+        console.error("Error al agregar la tienda:", error.response.data.error);
+      }
+    },
+    async deleteStore(storeId) {
+      const confirmation = confirm("¿Estás seguro de que deseas eliminar esta tienda?");
+      if (!confirmation) return;
+
+      try {
+        await axios.delete(`/tienda/delete/${storeId}`);
+        this.tiendas = this.tiendas.filter((tienda) => tienda.id !== storeId); // Eliminar tienda de la lista local
+        alert("Tienda eliminada con éxito.");
+      } catch (error) {
+        console.error("Error al eliminar la tienda:", error.response?.data || error.message);
+        alert("Hubo un error al intentar eliminar la tienda.");
+      }
     },
   },
   mounted() {
@@ -92,178 +241,281 @@ export default {
 </script>
 
 <style scoped>
-/* Estilo principal */
+/* Layout base */
 .layout {
   display: flex;
+  height: 100vh; /* Altura fija del viewport */
+  background-color: #f5f7fb;
+  overflow: hidden; /* Previene scroll en el body */
 }
 
 /* Contenido principal */
 .contenido-principal {
-  margin-left: 80px; /* Espacio por la barra lateral */
-  padding: 50px 20px 20px; /* Espacio superior para el buscador */
-  background-color: #ffffff;
-  min-height: 100vh;
-  width:90%; /* Asegura que ocupe el ancho restante */
-  box-sizing: border-box; /* Incluye padding en el cálculo de ancho */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-left: 0px;
+  height: 100vh;
+  overflow: hidden; /* Previene scroll doble */
 }
+
+/* Header container styles - ahora fijo en la parte superior */
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  background-color: #f5f7fb;
+  z-index: 10;
+}
+
 .buscador {
-  width: 400px;
-  margin-bottom: 20px; /* Separación entre el buscador y la tabla */
+  flex: 1;
+  max-width: 400px;
 }
 
 .input-buscador {
   width: 100%;
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-}
-.tabla {
-  width: 100%;
-  border-collapse: collapse; /* Evitar espacios entre bordes */
-  background: rgb(233, 233, 233);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra sutil */
-  border-radius: 8px; /* Bordes redondeados */
-  overflow: hidden; /* Evitar que elementos sobresalgan */
+  padding: 10px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: white;
 }
 
-.tabla td,
-.tabla th {
-  padding: 12px 15px;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
-}
-
-
-/* Gestión de tiendas */
+/* Store management section - contenedor scrolleable */
 .store-management {
-  width: 100%; /* Extiende al 100% del contenedor */
-  margin: 0 auto; /* Centrado */
-}
-
-.header {
-  width: 100%; /* Extiende la cabecera también */
+  flex: 1;
   display: flex;
-  justify-content: space-between; /* Separa los elementos */
-  align-items: center;
-  margin-bottom: 16px;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0 24px;
 }
 
-.header h2 {
+/* Header de gestión de tiendas - fijo */
+.store-management .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 0;
+  background-color: #f5f7fb;
+  z-index: 10;
+}
+
+.store-management h1 {
   font-size: 24px;
-  color: #333;
+  font-weight: 600;
+  color: #1a202c;
   margin: 0;
 }
 
 .add-store-btn {
   background-color: #0066ff;
   color: white;
-  border: none;
   padding: 8px 16px;
-  border-radius: 4px;
-  font-size: 19px;
-  cursor: pointer;
+  border-radius: 6px;
+  border: none;
   font-weight: 500;
+  cursor: pointer;
 }
 
+.add-store-btn:hover {
+  background-color: #0052cc;
+}
+
+/* Contenedor scrolleable de las tarjetas */
 .stores-container {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  flex: 1;
+  display: grid;
+  gap: 24px;
+  overflow-y: auto;
+  padding-bottom: 24px;
 }
 
-/* Tarjeta de cada tienda */
+/* Estilizar la barra de scroll */
+.stores-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.stores-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.stores-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.stores-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Store card styles */
 .store-card {
-  background: rgb(243, 243, 243);
-  border-radius: 8px;
-  padding: 16px;
   display: flex;
-  align-items: stretch;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .store-image {
-  width: 200px;
-  min-width: 200px;
-  background: #f5f5f5;
-  margin-right: 16px;
+  width: 150px;
+  height: 150px;
+  margin-right: 24px;
+  flex-shrink: 0;
 }
 
 .placeholder-image {
   width: 100%;
   height: 100%;
-  min-height: 150px;
-  background: #eee;
+  background-color: #f1f5f9;
+  border-radius: 8px;
 }
 
-/* Detalles de la tienda */
 .store-details {
-  flex-grow: 1;
-  padding-right: 16px;
-  text-align: left; /* Justifica el texto a la izquierda */
+  flex: 1;
 }
 
 .store-details h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a202c;
   margin: 0 0 16px 0;
-  font-size: 21px;
-  color: #333;
 }
 
 .store-info p {
+  color: #64748b;
   margin: 8px 0;
-  color: #666;
-  font-size: 18px;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
-.store-name {
-  color: #333;
-  font-weight: 500;
-}
-
-/* Sección de edición */
 .edit-section {
   display: flex;
-  align-items: center;
-  padding-left: 16px;
-  border-left: 1px solid #eee;
+  align-items: flex-start;
 }
 
 .edit-btn {
   color: #0066ff;
   background: none;
   border: none;
-  font-size: 19px;
+  font-size: 14px;
   cursor: pointer;
-  font-weight: 500;
-  padding: 8px 16px;
+  padding: 4px;
 }
 
 .edit-btn:hover {
   text-decoration: underline;
 }
 
-/* Responsividad */
-@media (max-width: 768px) {
-  .contenido-principal {
-    margin-left: 0;
-    padding: 20px;
-  }
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
 
+.modal {
+  background: white;
+  padding: 32px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal h2 {
+  margin: 0 0 24px 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.modal form > div {
+  margin-bottom: 16px;
+}
+
+.modal label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #1a202c;
+}
+
+.modal input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.modal-actions button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.modal-actions button[type="submit"] {
+  background-color: #0066ff;
+  color: white;
+  border: none;
+}
+
+.modal-actions button[type="button"] {
+  background-color: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
   .store-card {
     flex-direction: column;
   }
-
+  
   .store-image {
     width: 100%;
     margin-right: 0;
     margin-bottom: 16px;
   }
-
-  .edit-section {
-    border-left: none;
-    border-top: 1px solid #eee;
-    padding-top: 16px;
-    margin-top: 16px;
+  
+  .header-container {
+    flex-direction: column;
+    gap: 16px;
   }
+  
+  .buscador {
+    max-width: 100%;
+  }
+}
+.delete-btn {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  background-color: #c0392b;
 }
 </style>
