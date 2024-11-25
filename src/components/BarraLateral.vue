@@ -1,6 +1,7 @@
 <template>
   <div class="barra-lateral">
-    <!-- Logo -->
+    <!-- <img src="@/assets/icon.png" alt="kanban-logo"> -->
+
     <div class="logo">
       <span class="logo-text">KANBAN</span>
     </div>
