@@ -43,86 +43,109 @@
       </div>
 
       <!-- Formulario para actualizar producto -->
-      <div class="update-form" v-if="showUpdateDialog">
-        <h3>Actualizar Producto</h3>
-        <form @submit.prevent="updateProduct">
-          <div>
-            <label for="nombre">Nombre del Producto:</label>
-            <input
-              type="text"
-              id="nombre"
-              v-model="updatedProduct.nombre"
-              required
-            />
-          </div>
-          <div>
-            <label for="categoria">Categoría:</label>
-            <input
-              type="text"
-              id="categoria"
-              v-model="updatedProduct.categoria"
-              required
-            />
-          </div>
-          <div>
-            <label for="precioCompra">Precio de Compra:</label>
-            <input
-              type="number"
-              id="precioCompra"
-              v-model="updatedProduct.precioCompra"
-              required
-            />
-          </div>
-          <div>
-            <label for="cantidad">Cantidad:</label>
-            <input
-              type="number"
-              id="cantidad"
-              v-model="updatedProduct.cantidad"
-              required
-            />
-          </div>
-          <div>
-            <label for="unidad">Unidad:</label>
-            <input
-              type="text"
-              id="unidad"
-              v-model="updatedProduct.unidad"
-              required
-            />
-          </div>
-          <div>
-            <label for="fechadeventa">Fecha de Compra:</label>
-            <input
-              type="date"
-              id="fechadeventa"
-              v-model="updatedProduct.fechadeventa"
-            />
-          </div>
-          <div>
-            <label for="fechaVencimiento">Fecha de Caducidad:</label>
-            <input
-              type="date"
-              id="fechaVencimiento"
-              v-model="updatedProduct.fechaVencimiento"
-            />
-          </div>
-          <div>
-            <label for="valorUmbral">Umbral:</label>
-            <input
-              type="number"
-              id="valorUmbral"
-              v-model="updatedProduct.valorUmbral"
-              required
-            />
-          </div>
-          <div class="form-actions">
-            <button type="submit" class="save-btn">Guardar Cambios</button>
-            <button type="button" @click="closeUpdateDialog" class="cancel-btn">
-              Cancelar
-            </button>
-          </div>
-        </form>
+      <div class="modal-overlay" v-if="showUpdateDialog">
+        <div class="modal">
+          <h2 class="modal-title">Update Product</h2>
+          <form @submit.prevent="updateProduct" class="form-container">
+            <!-- Imagen -->
+            <div class="form-group image-upload">
+              <label for="imagen">
+                <div class="image-placeholder">
+                  <span v-if="!updatedProduct.imagen">Drag image here or</span>
+                  <span v-if="!updatedProduct.imagen" class="browse-link">Browse image</span>
+                  <img v-if="updatedProduct.imagenPreview" :src="updatedProduct.imagenPreview" alt="Preview" />
+                </div>
+              </label>
+              <input type="file" id="imagen" @change="handleImageUpload" accept="image/*" hidden />
+            </div>
+
+            <!-- Campos del formulario -->
+            <div class="form-group">
+              <label for="nombre">Product Name</label>
+              <input type="text" id="nombre" v-model="updatedProduct.nombre" placeholder="Enter product name" required />
+            </div>
+
+            <div class="form-group">
+              <label for="categoria">Category</label>
+              <input
+                type="text"
+                id="categoria"
+                v-model="updatedProduct.categoria"
+                placeholder="Enter product category"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="precioCompra">Buying Price</label>
+              <input
+                type="number"
+                id="precioCompra"
+                v-model="updatedProduct.precioCompra"
+                placeholder="Enter buying price"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="cantidad">Quantity</label>
+              <input
+                type="number"
+                id="cantidad"
+                v-model="updatedProduct.cantidad"
+                placeholder="Enter product quantity"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="unidad">Unit</label>
+              <input
+                type="text"
+                id="unidad"
+                v-model="updatedProduct.unidad"
+                placeholder="Enter product unit"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="fechaVencimiento">Expiry Date</label>
+              <input
+                type="date"
+                id="fechaVencimiento"
+                v-model="updatedProduct.fechaVencimiento"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="fechadeventa">Buying Date</label>
+              <input
+                type="date"
+                id="fechadeventa"
+                v-model="updatedProduct.fechadeventa"
+                placeholder="Enter buying date"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="valorUmbral">Threshold Value</label>
+              <input
+                type="number"
+                id="valorUmbral"
+                v-model="updatedProduct.valorUmbral"
+                placeholder="Enter threshold value"
+                required
+              />
+            </div>
+
+            <!-- Botones -->
+            <div class="modal-actions">
+              <button type="submit" class="add-btn">Update Product</button>
+              <button type="button" @click="closeUpdateDialog" class="discard-btn">Discard</button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>
@@ -142,7 +165,7 @@ export default {
     return {
       backendUrl: "http://localhost:3000", // URL base del backend
       showUpdateDialog: false,
-      updatedProduct: { ...this.product }, // Copia de los detalles del producto
+      updatedProduct: { ...this.product, imagenPreview: null }, // Copia del producto con preview
     };
   },
   methods: {
@@ -165,20 +188,38 @@ export default {
       this.$emit("close");
     },
     openUpdateDialog() {
-      this.updatedProduct = { ...this.product }; 
+      this.updatedProduct = { ...this.product, imagenPreview: null };
       this.showUpdateDialog = true;
     },
     closeUpdateDialog() {
       this.showUpdateDialog = false;
     },
+    handleImageUpload(event) {
+      const file = event.target.files[0];
+      this.updatedProduct.imagen = file;
+      this.updatedProduct.imagenPreview = URL.createObjectURL(file);
+    },
     async updateProduct() {
       try {
+        const formData = new FormData();
+        formData.append("nombre", this.updatedProduct.nombre);
+        formData.append("categoria", this.updatedProduct.categoria);
+        formData.append("precioCompra", this.updatedProduct.precioCompra);
+        formData.append("cantidad", this.updatedProduct.cantidad);
+        formData.append("unidad", this.updatedProduct.unidad);
+        formData.append("fechaVencimiento", this.updatedProduct.fechaVencimiento || "");
+        formData.append("fechadeventa", this.updatedProduct.fechadeventa || "");
+        formData.append("valorUmbral", this.updatedProduct.valorUmbral);
+        if (this.updatedProduct.imagen) {
+          formData.append("imagenProducto", this.updatedProduct.imagen);
+        }
+
         const response = await axios.put(
           `${this.backendUrl}/api/productos/${this.product.id}`,
-          this.updatedProduct
+          formData
         );
         alert("Producto actualizado correctamente");
-        this.$emit("update", response.data); 
+        this.$emit("update", response.data);
         this.closeUpdateDialog();
       } catch (error) {
         console.error(
@@ -193,7 +234,7 @@ export default {
         try {
           await axios.delete(`${this.backendUrl}/api/productos/${this.product.id}`);
           alert("Producto eliminado correctamente");
-          this.$emit("delete", this.product.id); 
+          this.$emit("delete", this.product.id);
         } catch (error) {
           console.error(
             "Error al eliminar el producto:",
@@ -229,8 +270,8 @@ export default {
   width: 90%;
   text-align: center;
   position: relative;
-  overflow-y: auto; 
-  max-height: 90vh; 
+  overflow-y: auto;
+  max-height: 90vh;
 }
 
 .header {
@@ -302,41 +343,124 @@ export default {
   margin-bottom: 20px;
 }
 
-.update-form {
-  position: absolute;
-  top: 10%;
-  left: 50%;
-  transform: translate(-50%, 0);
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
   z-index: 1100;
-  max-width: 400px;
-  width: 90%;
 }
 
-.form-actions {
-  margin-top: 20px;
+.modal {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-title {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+}
+
+.form-group input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  width: 100%;
+}
+
+.image-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.image-placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 150px;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.image-placeholder img {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 8px;
+}
+
+.browse-link {
+  color: #007bff;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.modal-actions {
   display: flex;
   justify-content: space-between;
+  margin-top: 20px;
 }
 
-.save-btn {
+.add-btn {
   background-color: #28a745;
   color: white;
-  padding: 10px 15px;
+  padding: 10px 20px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
 }
 
-.cancel-btn {
+.add-btn:hover {
+  background-color: #218838;
+}
+
+.discard-btn {
   background-color: #dc3545;
   color: white;
-  padding: 10px 15px;
+  padding: 10px 20px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+}
+
+.discard-btn:hover {
+  background-color: #c82333;
 }
 </style>
