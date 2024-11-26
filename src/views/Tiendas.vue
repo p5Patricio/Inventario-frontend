@@ -245,7 +245,7 @@ export default {
 .layout {
   display: flex;
   height: 100vh; /* Altura fija del viewport */
-  background-color: #f5f7fb;
+  background-color: #ffffff;
   overflow: hidden; /* Previene scroll en el body */
 }
 
@@ -254,6 +254,7 @@ export default {
   flex: 1;
   display: flex;
   flex-direction: column;
+  width: 1200px;
   margin-left: 0px;
   height: 100vh;
   overflow: hidden; /* Previene scroll doble */
@@ -298,7 +299,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 24px 0;
-  background-color: #f5f7fb;
+  background-color: #ffffff;
   z-index: 10;
 }
 
@@ -357,7 +358,7 @@ export default {
   background: white;
   border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 1px 1px 3px rgba(0, 0, 0.2, 0.3);
 }
 
 .store-image {

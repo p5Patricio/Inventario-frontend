@@ -84,135 +84,135 @@
   </script>
   
   <style scoped>
-/* Contenedor principal */
-.login-container {
-  display: flex;
-  justify-content: center;
-  margin-left: 150px;
-  margin-top: 50px;
-  align-items: center;
-  min-height: 100px;
-  background-color: white;
-  font-family: Arial, sans-serif;
-  padding: 20px;
-}
-
-/* Contenedor interno para logo y formulario */
-.content-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 50px; /* Espaciado entre el logo y el formulario */
-}
-
-/* Logo */
-.logo-container {
-  text-align: center;
-}
-.logo {
-  width: 200px;
-  height: auto;
-}
-.app-title {
-  font-size: 32px;
-  font-weight: bold;
-  color: #007bff;
-  margin-top: 10px;
-}
-
-/* Contenedor del formulario */
-.login-form-container {
-  background: #ffffff;
-  border-radius: 8px;
-  margin-left: 50px;
-  padding: 40px 30px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  max-width: 400px;
-  width: 100%;
-  text-align: center;
-}
-
-/* Título y subtítulo */
-h2 {
-  font-size: 25px;
-  font-weight: bold;
-}
-p {
-  font-size: 14px;
-  color: #6b7280;
-  margin-bottom: 20px;
-}
-
-/* Estilos de los inputs */
-.form-group {
-  margin-bottom: 15px;
-  text-align: left;
-}
-label {
-  display: block;
-  font-size: 14px;
-  margin-bottom: 5px;
-  color: #374151;
-}
-input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #d1d5db;
-  border-radius: 5px;
-  font-size: 14px;
-}
-
-/* Opciones del formulario */
-.form-options {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 12px;
-  margin-bottom: 20px;
-}
-.forgot-password {
-  color: #007bff;
-  text-decoration: none;
-}
-.forgot-password:hover {
-  text-decoration: underline;
-}
-
-/* Botones */
-.btn-primary {
-  background-color: #007bff;
-  color: #ffffff;
-  border: none;
-  border-radius: 5px;
-  padding: 10px 15px;
-  width: 100%;
-  cursor: pointer;
-  margin-bottom: 10px;
-  font-size: 14px;
-}
-.btn-primary:hover {
-  background-color: #0056b3;
-}
-.btn-google {
-  background-color: #ffffff;
-  color: #374151;
-  border: 1px solid #d1d5db;
-  border-radius: 5px;
-  padding: 10px 15px;
-  width: 100%;
-  cursor: pointer;
-  font-size: 14px;
-}
-.btn-google:hover {
-  background-color: #f9fafb;
-}
-
-/* Enlace de registro */
-.signup-link {
-  color: #007bff;
-  text-decoration: none;
-  font-weight: bold;
-}
-.signup-link:hover {
-  text-decoration: underline;
-}
-</style>
+  /* Contenedor principal */
+  .login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 90px;
+    min-height: 10px;
+    background-color: #f9fafb;
+    font-family: Arial, sans-serif;
+    padding: 20px;
+  }
+  
+  /* Contenedor interno para logo y formulario */
+  .content-wrapper {
+    display: flex;
+    margin-left: 160px;
+    align-items: center;
+    gap: 100px; /* Espaciado entre el logo y el formulario */
+  }
+  
+  /* Logo */
+  .logo-container {
+    text-align: center;
+  }
+  .logo {
+    width: 200px;
+    height: auto;
+  }
+  .app-title {
+    font-size: 32px;
+    font-weight: bold;
+    color: #007bff;
+    margin-top: 10px;
+  }
+  
+  /* Contenedor del formulario */
+  .login-form-container {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 40px 30px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+  }
+  
+  /* Título y subtítulo */
+  h2 {
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  p {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 20px;
+  }
+  
+  /* Estilos de los inputs */
+  .form-group {
+    margin-bottom: 15px;
+    text-align: left;
+  }
+  label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #374151;
+  }
+  input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 5px;
+    font-size: 14px;
+  }
+  
+  /* Opciones del formulario */
+  .form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    margin-bottom: 20px;
+  }
+  .forgot-password {
+    color: #007bff;
+    text-decoration: none;
+  }
+  .forgot-password:hover {
+    text-decoration: underline;
+  }
+  
+  /* Botones */
+  .btn-primary {
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    width: 100%;
+    cursor: pointer;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .btn-primary:hover {
+    background-color: #0056b3;
+  }
+  .btn-google {
+    background-color: #ffffff;
+    color: #374151;
+    border: 1px solid #d1d5db;
+    border-radius: 5px;
+    padding: 10px 15px;
+    width: 100%;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .btn-google:hover {
+    background-color: #f9fafb;
+  }
+  
+  /* Enlace de registro */
+  .signup-link {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  .signup-link:hover {
+    text-decoration: underline;
+  }
+  </style>
