@@ -178,6 +178,7 @@ html, body {
 .dashboard {
   width: 1150px;
   max-width: 1300px;
+  min-height: 100vh;
   margin: 0 auto;
   padding: 20px;
   display: flex;
