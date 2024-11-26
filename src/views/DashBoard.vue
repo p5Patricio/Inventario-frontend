@@ -1,6 +1,7 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
     <div class="layout">
+      <Userbar/>
       <BarraLateral/>
       <div class="contenido-principal">
         <h1>Pagina para el dashboard</h1>
@@ -11,10 +12,12 @@
 
 <script>
 //import axios from 'axios';
+import Userbar from "@/components/Userbar.vue";
 import BarraLateral from "../components/BarraLateral.vue";
   
 export default {
   components: {
+    Userbar, 
     BarraLateral,
   },
   data() {
