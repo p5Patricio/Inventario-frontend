@@ -85,52 +85,88 @@
       <!-- Modal para agregar producto -->
       <div v-if="showAddProductDialog" class="modal-overlay">
         <div class="modal">
-          <h2>Agregar Producto</h2>
-          <form @submit.prevent="submitNewProduct">
-            <div>
-              <label for="imagen">Imagen del Producto:</label>
+          <h2 class="modal-title">New Product</h2>
+          <form @submit.prevent="submitNewProduct" class="form-container">
+            <!-- Imagen -->
+            <div class="form-group image-upload">
+              <label for="imagen">
+                <div class="image-placeholder">
+                  <span v-if="!newProduct.imagen">Drag image here or</span>
+                  <span v-if="!newProduct.imagen" class="browse-link">Browse image</span>
+                  <img v-if="newProduct.imagenPreview" :src="newProduct.imagenPreview" alt="Preview" />
+                </div>
+              </label>
+              <input type="file" id="imagen" @change="handleImageUpload" accept="image/*" hidden />
+            </div>
+
+            <!-- Campos del formulario -->
+            <div class="form-group">
+              <label for="nombre">Product Name</label>
+              <input type="text" id="nombre" v-model="newProduct.nombre" placeholder="Enter product name" required />
+            </div>
+
+            <div class="form-group">
+              <label for="categoria">Category</label>
+              <input type="text" id="categoria" v-model="newProduct.categoria" placeholder="Enter product category" required />
+            </div>
+
+            <div class="form-group">
+              <label for="precioCompra">Buying Price</label>
               <input
-                type="file"
-                id="imagen"
-                @change="handleImageUpload"
-                accept="image/*"
+                type="number"
+                id="precioCompra"
+                v-model="newProduct.precioCompra"
+                placeholder="Enter buying price"
+                required
               />
             </div>
-            <div>
-              <label for="nombre">Nombre del Producto:</label>
-              <input type="text" id="nombre" v-model="newProduct.nombre" required />
+
+            <div class="form-group">
+              <label for="cantidad">Quantity</label>
+              <input
+                type="number"
+                id="cantidad"
+                v-model="newProduct.cantidad"
+                placeholder="Enter product quantity"
+                required
+              />
             </div>
-            <div>
-              <label for="categoria">Categoría:</label>
-              <input type="text" id="categoria" v-model="newProduct.categoria" required />
+
+            <div class="form-group">
+              <label for="unidad">Unit</label>
+              <input type="text" id="unidad" v-model="newProduct.unidad" placeholder="Enter product unit" required />
             </div>
-            <div>
-              <label for="precioCompra">Precio de Compra:</label>
-              <input type="number" id="precioCompra" v-model="newProduct.precioCompra" required />
+
+            <div class="form-group">
+              <label for="fechaVencimiento">Expiry Date</label>
+              <input
+                type="date"
+                id="fechaVencimiento"
+                v-model="newProduct.fechaVencimiento"
+                placeholder="Enter expiry date"
+              />
             </div>
-            <div>
-              <label for="cantidad">Cantidad:</label>
-              <input type="number" id="cantidad" v-model="newProduct.cantidad" required />
+
+            <div class="form-group">
+              <label for="fechadeventa">Buying Date</label>
+              <input type="date" id="fechadeventa" v-model="newProduct.fechadeventa" placeholder="Enter buying date" />
             </div>
-            <div>
-              <label for="unidad">Unidad:</label>
-              <input type="text" id="unidad" v-model="newProduct.unidad" required />
+
+            <div class="form-group">
+              <label for="valorUmbral">Threshold Value</label>
+              <input
+                type="number"
+                id="valorUmbral"
+                v-model="newProduct.valorUmbral"
+                placeholder="Enter threshold value"
+                required
+              />
             </div>
-            <div>
-              <label for="fechaVencimiento">Fecha de Caducidad:</label>
-              <input type="date" id="fechaVencimiento" v-model="newProduct.fechaVencimiento" />
-            </div>
-            <div>
-              <label for="fechadeventa">Fecha de Compra:</label> <!-- Texto ajustado -->
-              <input type="date" id="fechadeventa" v-model="newProduct.fechadeventa" />
-            </div>
-            <div>
-              <label for="valorUmbral">Umbral:</label>
-              <input type="number" id="valorUmbral" v-model="newProduct.valorUmbral" required />
-            </div>
+
+            <!-- Botones -->
             <div class="modal-actions">
-              <button type="submit">Agregar Producto</button>
-              <button type="button" @click="toggleAddProductDialog">Cancelar</button>
+              <button type="submit" class="add-btn">Add Product</button>
+              <button type="button" @click="toggleAddProductDialog" class="discard-btn">Discard</button>
             </div>
           </form>
         </div>
@@ -181,6 +217,7 @@ export default {
         fechadeventa: "", 
         valorUmbral: 0,
         imagen: null,
+        imagenPreview: null,
       },
     };
   },
@@ -221,6 +258,7 @@ export default {
     handleImageUpload(event) {
       const file = event.target.files[0];
       this.newProduct.imagen = file;
+      this.newProduct.imagenPreview = URL.createObjectURL(file); // Vista previa
     },
     async submitNewProduct() {
       try {
@@ -260,6 +298,7 @@ export default {
         fechadeventa: "", 
         valorUmbral: 0,
         imagen: null,
+        imagenPreview: null,
       };
     },
     selectProduct(product) {
@@ -398,20 +437,88 @@ tbody tr:hover {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000;
 }
 
 .modal {
   background: white;
-  padding: 20px;
+  padding: 30px;
   border-radius: 8px;
-  width: 400px;
+  width: 600px; /* Ajustado para mayor ancho */
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.modal input[type="file"] {
-  margin-bottom: 10px;
+.modal-title {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  align-items: center; /* Alinea verticalmente */
+  justify-content: flex-start; /* Alinea horizontalmente hacia la izquierda */
+  gap: 15px; /* Espacio entre label y input */
+}
+
+.form-group label {
+  flex: 0 0 150px; /* Tamaño fijo para las etiquetas */
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  text-align: left;
+}
+
+.form-group input,
+.form-group select {
+  flex: 1; /* Los inputs ocupan el espacio restante */
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  width: 100%;
+}
+
+.image-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.image-placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 150px;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.image-placeholder img {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 8px;
+}
+
+.browse-link {
+  color: #007bff;
+  font-weight: bold;
+  cursor: pointer;
 }
 
 .modal-actions {
@@ -428,20 +535,21 @@ tbody tr:hover {
   font-size: 14px;
 }
 
-.modal-actions button[type="submit"] {
+.add-btn {
   background-color: #0052cc;
   color: white;
 }
 
-.modal-actions button[type="submit"]:hover {
+.add-btn:hover {
   background-color: #003d99;
 }
 
-.modal-actions button[type="button"] {
+.discard-btn {
   background-color: #ddd;
+  color: black;
 }
 
-.modal-actions button[type="button"]:hover {
+.discard-btn:hover {
   background-color: #bbb;
 }
 
