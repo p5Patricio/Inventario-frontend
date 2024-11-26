@@ -19,22 +19,22 @@
         <div class="summary-card">
           <h2>Categorías</h2>
           <p>{{ categories }}</p>
-          <small>Últimos 7 días</small>
+          <small>Total de categorías únicas</small>
         </div>
         <div class="summary-card">
           <h2>Total Productos</h2>
           <p>{{ totalProducts }}</p>
-          <small>Últimos 7 días</small>
+          <small>Número total de productos</small>
         </div>
         <div class="summary-card">
           <h2>Más Vendidos</h2>
-          <p>{{ topSelling }}</p>
-          <small>Últimos 7 días</small>
+          <p>{{ topSelling.nombre || "N/A" }}</p>
+          <small>Producto con mayores ventas</small>
         </div>
         <div class="summary-card">
           <h2>Bajo Stock</h2>
           <p>{{ lowStock }}</p>
-          <small>Pedido/No en stock</small>
+          <small>Productos por debajo del umbral</small>
         </div>
       </div>
 
@@ -165,7 +165,7 @@ export default {
       selectedProduct: null,
       categories: 0,
       totalProducts: 0,
-      topSelling: 0,
+      topSelling: {}, // Producto más vendido
       lowStock: 0,
       newProduct: {
         nombre: "",
@@ -202,9 +202,13 @@ export default {
       }
     },
     updateSummary() {
+      // Actualiza las métricas
       this.categories = new Set(this.inventario.map((item) => item.categoria)).size;
       this.totalProducts = this.inventario.length;
-      this.topSelling = Math.floor(Math.random() * this.totalProducts);
+      this.topSelling = this.inventario.reduce((prev, current) =>
+        (prev.ventas || 0) > (current.ventas || 0) ? prev : current,
+        {}
+      );
       this.lowStock = this.inventario.filter((item) => item.cantidad < item.valorUmbral).length;
     },
     toggleAddProductDialog() {
@@ -260,17 +264,19 @@ export default {
       this.selectedProduct = null;
       this.showProductDetails = false;
     },
-    async handleProductUpdate(updatedProduct) {
+    handleProductUpdate(updatedProduct) {
       const index = this.inventario.findIndex(
         (product) => product.id === updatedProduct.id
       );
       if (index !== -1) {
         this.inventario.splice(index, 1, updatedProduct);
       }
+      this.updateSummary();
       this.closeProductDetails();
     },
-    async handleProductDelete(productId) {
+    handleProductDelete(productId) {
       this.inventario = this.inventario.filter((product) => product.id !== productId);
+      this.updateSummary();
       this.closeProductDetails();
     },
   },
