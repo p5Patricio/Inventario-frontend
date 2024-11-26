@@ -21,11 +21,15 @@
           />
         </div>
         <div class="details">
-          <h2>Detalles Primarios</h2>
+          <h2>Detalles del producto</h2>
           <p><strong>Categoría:</strong> {{ product.categoria }}</p>
           <p><strong>Precio de Compra:</strong> ${{ product.precioCompra }}</p>
           <p><strong>Cantidad:</strong> {{ product.cantidad }}</p>
           <p><strong>Unidad:</strong> {{ product.unidad }}</p>
+          <p>
+            <strong>Fecha de Compra:</strong>
+            {{ product.fechadeventa || "N/A" }}
+          </p>
           <p>
             <strong>Fecha de Caducidad:</strong>
             {{ product.fechaVencimiento || "N/A" }}
@@ -85,6 +89,14 @@
               id="unidad"
               v-model="updatedProduct.unidad"
               required
+            />
+          </div>
+          <div>
+            <label for="fechadeventa">Fecha de Compra:</label>
+            <input
+              type="date"
+              id="fechadeventa"
+              v-model="updatedProduct.fechadeventa"
             />
           </div>
           <div>
@@ -153,7 +165,7 @@ export default {
       this.$emit("close");
     },
     openUpdateDialog() {
-      this.updatedProduct = { ...this.product }; // Resetear datos al abrir
+      this.updatedProduct = { ...this.product }; 
       this.showUpdateDialog = true;
     },
     closeUpdateDialog() {
@@ -166,7 +178,7 @@ export default {
           this.updatedProduct
         );
         alert("Producto actualizado correctamente");
-        this.$emit("update", response.data); // Notificar al componente padre
+        this.$emit("update", response.data); 
         this.closeUpdateDialog();
       } catch (error) {
         console.error(
@@ -181,7 +193,7 @@ export default {
         try {
           await axios.delete(`${this.backendUrl}/api/productos/${this.product.id}`);
           alert("Producto eliminado correctamente");
-          this.$emit("delete", this.product.id); // Notificar al componente padre
+          this.$emit("delete", this.product.id); 
         } catch (error) {
           console.error(
             "Error al eliminar el producto:",
@@ -217,8 +229,8 @@ export default {
   width: 90%;
   text-align: center;
   position: relative;
-  overflow-y: auto; /* Habilita scroll si es necesario */
-  max-height: 90vh; /* Limita el alto */
+  overflow-y: auto; 
+  max-height: 90vh; 
 }
 
 .header {

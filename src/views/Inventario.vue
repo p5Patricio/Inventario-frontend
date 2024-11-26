@@ -27,7 +27,7 @@
           <small>Número total de productos</small>
         </div>
         <div class="summary-card">
-          <h2>Más Vendidos</h2>
+          <h2>Más Comprados</h2>
           <p>{{ topSelling.nombre || "N/A" }}</p>
           <small>Producto con mayores ventas</small>
         </div>
@@ -121,6 +121,10 @@
               <input type="date" id="fechaVencimiento" v-model="newProduct.fechaVencimiento" />
             </div>
             <div>
+              <label for="fechadeventa">Fecha de Compra:</label> <!-- Texto ajustado -->
+              <input type="date" id="fechadeventa" v-model="newProduct.fechadeventa" />
+            </div>
+            <div>
               <label for="valorUmbral">Umbral:</label>
               <input type="number" id="valorUmbral" v-model="newProduct.valorUmbral" required />
             </div>
@@ -165,7 +169,7 @@ export default {
       selectedProduct: null,
       categories: 0,
       totalProducts: 0,
-      topSelling: {}, // Producto más vendido
+      topSelling: {}, 
       lowStock: 0,
       newProduct: {
         nombre: "",
@@ -174,6 +178,7 @@ export default {
         cantidad: 0,
         unidad: "",
         fechaVencimiento: "",
+        fechadeventa: "", 
         valorUmbral: 0,
         imagen: null,
       },
@@ -202,7 +207,6 @@ export default {
       }
     },
     updateSummary() {
-      // Actualiza las métricas
       this.categories = new Set(this.inventario.map((item) => item.categoria)).size;
       this.totalProducts = this.inventario.length;
       this.topSelling = this.inventario.reduce((prev, current) =>
@@ -227,6 +231,7 @@ export default {
         formData.append("cantidad", this.newProduct.cantidad);
         formData.append("unidad", this.newProduct.unidad);
         formData.append("fechaVencimiento", this.newProduct.fechaVencimiento || "");
+        formData.append("fechadeventa", this.newProduct.fechadeventa || ""); 
         formData.append("valorUmbral", this.newProduct.valorUmbral);
         formData.append("imagenProducto", this.newProduct.imagen);
 
@@ -252,6 +257,7 @@ export default {
         cantidad: 0,
         unidad: "",
         fechaVencimiento: "",
+        fechadeventa: "", 
         valorUmbral: 0,
         imagen: null,
       };
