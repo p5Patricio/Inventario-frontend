@@ -4,11 +4,11 @@
     <Userbar />
     <BarraLateral />
     <div class="contenido-principal">
-      <!-- Barra de búsqueda -->
+      <!-- Search Bar -->
       <div class="search-bar">
         <input
           type="text"
-          placeholder="Buscar producto, proveedor, pedido"
+          placeholder="Search product, supplier, order"
           v-model="searchTerm"
           @input="filterProducts"
         />
@@ -17,42 +17,42 @@
       <!-- Overall Inventory -->
       <div class="overall-inventory" v-if="!showProductDetails">
         <div class="summary-card">
-          <h2>Categorías</h2>
+          <h2>Categories</h2>
           <p>{{ categories }}</p>
-          <small>Total de categorías únicas</small>
+          <small>Unique categories</small>
         </div>
         <div class="summary-card">
-          <h2>Total Productos</h2>
+          <h2>Total Products</h2>
           <p>{{ totalProducts }}</p>
-          <small>Número total de productos</small>
+          <small>Total number of products</small>
         </div>
         <div class="summary-card">
-          <h2>Más Comprados</h2>
+          <h2>Top Selling</h2>
           <p>{{ topSelling.nombre || "N/A" }}</p>
-          <small>Producto con mayores ventas</small>
+          <small>Best-selling product</small>
         </div>
         <div class="summary-card">
-          <h2>Bajo Stock</h2>
+          <h2>Low Stock</h2>
           <p>{{ lowStock }}</p>
-          <small>Productos por debajo del umbral</small>
+          <small>Products below threshold</small>
         </div>
       </div>
 
-      <!-- Tabla de productos -->
+      <!-- Products Table -->
       <div class="table-container" v-if="!showProductDetails">
         <button class="add-product-btn" @click="toggleAddProductDialog">
-          Agregar Producto
+          Add Product
         </button>
         <div class="product-table">
           <table>
             <thead>
               <tr>
-                <th>Producto</th>
-                <th>Precio de Compra</th>
-                <th>Cantidad</th>
-                <th>Umbral</th>
-                <th>Fecha de Caducidad</th>
-                <th>Disponibilidad</th>
+                <th>Product</th>
+                <th>Buying Price</th>
+                <th>Quantity</th>
+                <th>Threshold Value</th>
+                <th>Expiry Date</th>
+                <th>Availability</th>
               </tr>
             </thead>
             <tbody>
@@ -63,15 +63,15 @@
                 style="cursor: pointer;"
               >
                 <td>{{ item.nombre }}</td>
-                <td>${{ item.precioCompra }}</td>
+                <td>₹{{ item.precioCompra }}</td>
                 <td>{{ item.cantidad }}</td>
                 <td>{{ item.valorUmbral }}</td>
                 <td>{{ item.fechaVencimiento || "N/A" }}</td>
                 <td
                   :class="{
-                    'in-stock': item.estadoDisponibilidad === 'En existencia',
-                    'out-of-stock': item.estadoDisponibilidad === 'Agotado',
-                    'low-stock': item.estadoDisponibilidad === 'Bajo stock',
+                    'in-stock': item.estadoDisponibilidad === 'In-stock',
+                    'out-of-stock': item.estadoDisponibilidad === 'Out of stock',
+                    'low-stock': item.estadoDisponibilidad === 'Low stock',
                   }"
                 >
                   {{ item.estadoDisponibilidad }}
@@ -82,12 +82,12 @@
         </div>
       </div>
 
-      <!-- Modal para agregar producto -->
+      <!-- Add Product Modal -->
       <div v-if="showAddProductDialog" class="modal-overlay">
         <div class="modal">
           <h2 class="modal-title">New Product</h2>
           <form @submit.prevent="submitNewProduct" class="form-container">
-            <!-- Imagen -->
+            <!-- Image -->
             <div class="form-group image-upload">
               <label for="imagen">
                 <div class="image-placeholder">
@@ -99,7 +99,7 @@
               <input type="file" id="imagen" @change="handleImageUpload" accept="image/*" hidden />
             </div>
 
-            <!-- Campos del formulario -->
+            <!-- Form Fields -->
             <div class="form-group">
               <label for="nombre">Product Name</label>
               <input type="text" id="nombre" v-model="newProduct.nombre" placeholder="Enter product name" required />
@@ -163,7 +163,7 @@
               />
             </div>
 
-            <!-- Botones -->
+            <!-- Buttons -->
             <div class="modal-actions">
               <button type="submit" class="add-btn">Add Product</button>
               <button type="button" @click="toggleAddProductDialog" class="discard-btn">Discard</button>
@@ -172,7 +172,7 @@
         </div>
       </div>
 
-      <!-- Detalles del producto -->
+      <!-- Product Details -->
       <ProductDetails
         v-if="showProductDetails"
         :product="selectedProduct"
@@ -205,7 +205,7 @@ export default {
       selectedProduct: null,
       categories: 0,
       totalProducts: 0,
-      topSelling: {}, 
+      topSelling: {},
       lowStock: 0,
       newProduct: {
         nombre: "",
@@ -214,7 +214,7 @@ export default {
         cantidad: 0,
         unidad: "",
         fechaVencimiento: "",
-        fechadeventa: "", 
+        fechadeventa: "",
         valorUmbral: 0,
         imagen: null,
         imagenPreview: null,
@@ -240,7 +240,7 @@ export default {
         }));
         this.updateSummary();
       } catch (error) {
-        console.error("Hubo un error al obtener los datos:", error);
+        console.error("Error fetching inventory:", error);
       }
     },
     updateSummary() {
@@ -258,7 +258,7 @@ export default {
     handleImageUpload(event) {
       const file = event.target.files[0];
       this.newProduct.imagen = file;
-      this.newProduct.imagenPreview = URL.createObjectURL(file); // Vista previa
+      this.newProduct.imagenPreview = URL.createObjectURL(file);
     },
     async submitNewProduct() {
       try {
@@ -269,7 +269,7 @@ export default {
         formData.append("cantidad", this.newProduct.cantidad);
         formData.append("unidad", this.newProduct.unidad);
         formData.append("fechaVencimiento", this.newProduct.fechaVencimiento || "");
-        formData.append("fechadeventa", this.newProduct.fechadeventa || ""); 
+        formData.append("fechadeventa", this.newProduct.fechadeventa || "");
         formData.append("valorUmbral", this.newProduct.valorUmbral);
         formData.append("imagenProducto", this.newProduct.imagen);
 
@@ -284,7 +284,7 @@ export default {
         this.resetNewProduct();
         this.updateSummary();
       } catch (error) {
-        console.error("Error al agregar el producto:", error.response?.data || error.message);
+        console.error("Error adding product:", error.response?.data || error.message);
       }
     },
     resetNewProduct() {
@@ -295,7 +295,7 @@ export default {
         cantidad: 0,
         unidad: "",
         fechaVencimiento: "",
-        fechadeventa: "", 
+        fechadeventa: "",
         valorUmbral: 0,
         imagen: null,
         imagenPreview: null,
@@ -370,10 +370,20 @@ export default {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.summary-card h2 {
-  margin: 0;
-  font-size: 16px;
-  font-weight: bold;
+.summary-card:nth-child(1) h2 {
+  color: #0056b3; 
+}
+
+.summary-card:nth-child(2) h2 {
+  color: #ff9f43; 
+}
+
+.summary-card:nth-child(3) h2 {
+  color: #6f42c1; 
+}
+
+.summary-card:nth-child(4) h2 {
+  color: #dc3545;
 }
 
 .summary-card p {
@@ -427,6 +437,21 @@ tbody tr:hover {
   cursor: pointer;
 }
 
+.in-stock {
+  color: #28a745; 
+  font-weight: bold;
+}
+
+.out-of-stock {
+  color: #dc3545; 
+  font-weight: bold;
+}
+
+.low-stock {
+  color: #ffc107; 
+  font-weight: bold;
+}
+
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -444,7 +469,7 @@ tbody tr:hover {
   background: white;
   padding: 30px;
   border-radius: 8px;
-  width: 600px; /* Ajustado para mayor ancho */
+  width: 600px; 
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -465,13 +490,13 @@ tbody tr:hover {
 
 .form-group {
   display: flex;
-  align-items: center; /* Alinea verticalmente */
-  justify-content: flex-start; /* Alinea horizontalmente hacia la izquierda */
-  gap: 15px; /* Espacio entre label y input */
+  align-items: center; 
+  justify-content: flex-start; 
+  gap: 15px; 
 }
 
 .form-group label {
-  flex: 0 0 150px; /* Tamaño fijo para las etiquetas */
+  flex: 0 0 150px; 
   font-size: 14px;
   font-weight: bold;
   color: #333;
@@ -480,7 +505,7 @@ tbody tr:hover {
 
 .form-group input,
 .form-group select {
-  flex: 1; /* Los inputs ocupan el espacio restante */
+  flex: 1; 
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 5px;

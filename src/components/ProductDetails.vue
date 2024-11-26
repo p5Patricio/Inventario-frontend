@@ -1,53 +1,53 @@
 <template>
   <div class="product-details-overlay">
     <div class="product-details">
-      <!-- Header con título y botones de acción -->
+      <!-- Header with title and action buttons -->
       <div class="header">
         <h1>{{ product.nombre }}</h1>
         <div class="actions">
-          <button @click="openUpdateDialog" class="update-btn">Actualizar</button>
-          <button @click="deleteProduct" class="delete-btn">Eliminar</button>
-          <button @click="goBack" class="close-btn">Cerrar</button>
+          <button @click="openUpdateDialog" class="update-btn">Update</button>
+          <button @click="deleteProduct" class="delete-btn">Delete</button>
+          <button @click="goBack" class="close-btn">Close</button>
         </div>
       </div>
 
-      <!-- Detalles del producto -->
+      <!-- Product details -->
       <div class="details-container">
-        <!-- Imagen del producto -->
+        <!-- Product image -->
         <div class="image-container" v-if="product.imagenProducto">
           <img
             :src="getFullImageUrl(product.imagenProducto)"
-            alt="Imagen del Producto"
+            alt="Product Image"
           />
         </div>
         <div class="details">
-          <h2>Detalles del producto</h2>
-          <p><strong>Categoría:</strong> {{ product.categoria }}</p>
-          <p><strong>Precio de Compra:</strong> ${{ product.precioCompra }}</p>
-          <p><strong>Cantidad:</strong> {{ product.cantidad }}</p>
-          <p><strong>Unidad:</strong> {{ product.unidad }}</p>
+          <h2>Product Details</h2>
+          <p><strong>Category:</strong> {{ product.categoria }}</p>
+          <p><strong>Buying Price:</strong> ${{ product.precioCompra }}</p>
+          <p><strong>Quantity:</strong> {{ product.cantidad }}</p>
+          <p><strong>Unit:</strong> {{ product.unidad }}</p>
           <p>
-            <strong>Fecha de Compra:</strong>
+            <strong>Buying Date:</strong>
             {{ product.fechadeventa || "N/A" }}
           </p>
           <p>
-            <strong>Fecha de Caducidad:</strong>
+            <strong>Expiry Date:</strong>
             {{ product.fechaVencimiento || "N/A" }}
           </p>
-          <p><strong>Umbral:</strong> {{ product.valorUmbral }}</p>
+          <p><strong>Threshold:</strong> {{ product.valorUmbral }}</p>
           <p>
-            <strong>Disponibilidad:</strong>
+            <strong>Availability:</strong>
             {{ traducirEstado(product.estadoDisponibilidad) }}
           </p>
         </div>
       </div>
 
-      <!-- Formulario para actualizar producto -->
+      <!-- Update product form -->
       <div class="modal-overlay" v-if="showUpdateDialog">
         <div class="modal">
           <h2 class="modal-title">Update Product</h2>
           <form @submit.prevent="updateProduct" class="form-container">
-            <!-- Imagen -->
+            <!-- Image -->
             <div class="form-group image-upload">
               <label for="imagen">
                 <div class="image-placeholder">
@@ -59,7 +59,7 @@
               <input type="file" id="imagen" @change="handleImageUpload" accept="image/*" hidden />
             </div>
 
-            <!-- Campos del formulario -->
+            <!-- Form fields -->
             <div class="form-group">
               <label for="nombre">Product Name</label>
               <input type="text" id="nombre" v-model="updatedProduct.nombre" placeholder="Enter product name" required />
@@ -139,7 +139,7 @@
               />
             </div>
 
-            <!-- Botones -->
+            <!-- Buttons -->
             <div class="modal-actions">
               <button type="submit" class="add-btn">Update Product</button>
               <button type="button" @click="closeUpdateDialog" class="discard-btn">Discard</button>
