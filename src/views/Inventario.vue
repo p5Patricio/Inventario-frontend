@@ -15,7 +15,7 @@
       </div>
 
       <!-- Overall Inventory -->
-      <div class="overall-inventory">
+      <div class="overall-inventory" v-if="!showProductDetails">
         <div class="summary-card">
           <h2>Categorías</h2>
           <p>{{ categories }}</p>
@@ -39,11 +39,11 @@
       </div>
 
       <!-- Tabla de productos -->
-      <div class="table-container">
+      <div class="table-container" v-if="!showProductDetails">
         <button class="add-product-btn" @click="toggleAddProductDialog">
           Agregar Producto
         </button>
-        <div class="product-table" v-if="!showProductDetails">
+        <div class="product-table">
           <table>
             <thead>
               <tr>
@@ -137,6 +137,8 @@
         v-if="showProductDetails"
         :product="selectedProduct"
         @close="closeProductDetails"
+        @update="handleProductUpdate"
+        @delete="handleProductDelete"
       />
     </div>
   </div>
@@ -257,6 +259,19 @@ export default {
     closeProductDetails() {
       this.selectedProduct = null;
       this.showProductDetails = false;
+    },
+    async handleProductUpdate(updatedProduct) {
+      const index = this.inventario.findIndex(
+        (product) => product.id === updatedProduct.id
+      );
+      if (index !== -1) {
+        this.inventario.splice(index, 1, updatedProduct);
+      }
+      this.closeProductDetails();
+    },
+    async handleProductDelete(productId) {
+      this.inventario = this.inventario.filter((product) => product.id !== productId);
+      this.closeProductDetails();
     },
   },
   mounted() {
