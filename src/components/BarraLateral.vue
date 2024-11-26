@@ -2,6 +2,8 @@
   <div class="barra-lateral">
     <!-- Logo -->
     <div class="logo">
+      <!-- Imagen del logo -->
+      <img src="@/assets/image.png" alt="Logo" class="logo-img" />
       <span class="logo-text">KANBAN</span>
     </div>
     
@@ -66,6 +68,12 @@ export default {
 
   
 <style scoped>
+.logo-img {
+  width: 40px; /* Tamaño pequeño para el logo */
+  height: auto;
+  display: block;
+  margin: 0 auto 10px; /* Centrado arriba del texto KANBAN */
+}
 .barra-lateral {
   width: 250px;
   height: 100vh;
@@ -138,7 +146,7 @@ a:hover, a.router-link-active {
 .settings-section {
   margin-top: auto;
   font-size: 1px;
-  padding-top: 120px;
+  padding-top: 50px;
 }
 
 .settings-link {
