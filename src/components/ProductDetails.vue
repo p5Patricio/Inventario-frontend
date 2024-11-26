@@ -7,6 +7,7 @@
         <div class="actions">
           <button @click="openUpdateDialog" class="update-btn">Actualizar</button>
           <button @click="deleteProduct" class="delete-btn">Eliminar</button>
+          <button @click="goBack" class="close-btn">Cerrar</button>
         </div>
       </div>
 
@@ -37,15 +38,8 @@
         </div>
       </div>
 
-      <!-- Botón para cerrar -->
-      <div class="footer">
-        <button @click="goBack">Cerrar</button>
-      </div>
-    </div>
-
-    <!-- Modal para actualizar el producto -->
-    <div v-if="showUpdateDialog" class="modal-overlay">
-      <div class="modal">
+      <!-- Formulario para actualizar producto -->
+      <div class="update-form" v-if="showUpdateDialog">
         <h3>Actualizar Producto</h3>
         <form @submit.prevent="updateProduct">
           <div>
@@ -110,7 +104,7 @@
               required
             />
           </div>
-          <div>
+          <div class="form-actions">
             <button type="submit" class="save-btn">Guardar Cambios</button>
             <button type="button" @click="closeUpdateDialog" class="cancel-btn">
               Cancelar
@@ -168,25 +162,31 @@ export default {
     async updateProduct() {
       try {
         const response = await axios.put(
-          `${this.backendUrl}/productos/${this.product.id}`,
+          `${this.backendUrl}/api/productos/${this.product.id}`,
           this.updatedProduct
         );
         alert("Producto actualizado correctamente");
         this.$emit("update", response.data); // Notificar al componente padre
         this.closeUpdateDialog();
       } catch (error) {
-        console.error("Error al actualizar el producto:", error.response?.data || error.message);
+        console.error(
+          "Error al actualizar el producto:",
+          error.response?.data || error.message
+        );
         alert("No se pudo actualizar el producto.");
       }
     },
     async deleteProduct() {
       if (confirm("¿Estás seguro de que deseas eliminar este producto?")) {
         try {
-          await axios.delete(`${this.backendUrl}/productos/${this.product.id}`);
+          await axios.delete(`${this.backendUrl}/api/productos/${this.product.id}`);
           alert("Producto eliminado correctamente");
           this.$emit("delete", this.product.id); // Notificar al componente padre
         } catch (error) {
-          console.error("Error al eliminar el producto:", error.response?.data || error.message);
+          console.error(
+            "Error al eliminar el producto:",
+            error.response?.data || error.message
+          );
           alert("No se pudo eliminar el producto.");
         }
       }
@@ -211,12 +211,14 @@ export default {
 
 .product-details {
   background: white;
+  border-radius: 8px;
   padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   max-width: 800px;
   width: 90%;
   text-align: center;
+  position: relative;
+  overflow-y: auto; /* Habilita scroll si es necesario */
+  max-height: 90vh; /* Limita el alto */
 }
 
 .header {
@@ -249,6 +251,19 @@ export default {
   background-color: #0056b3;
 }
 
+.close-btn {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  background-color: #5a6268;
+}
+
 .delete-btn {
   background-color: #dc3545;
   color: white;
@@ -264,37 +279,52 @@ export default {
 
 .details-container {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: center;
   margin: 20px 0;
 }
 
 .image-container img {
-  max-width: 150px;
-  border-radius: 10px;
+  max-width: 300px;
+  border-radius: 8px;
+  margin-bottom: 20px;
 }
 
-.footer {
-  margin-top: 20px;
-}
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.modal {
+.update-form {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translate(-50%, 0);
   background: white;
   padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  z-index: 1100;
   max-width: 400px;
   width: 90%;
+}
+
+.form-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.save-btn {
+  background-color: #28a745;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background-color: #dc3545;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 </style>
