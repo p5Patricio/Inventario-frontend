@@ -6,16 +6,19 @@
     <div class="dashboard">
       <!-- Encabezado -->
       <section class="header">
-        <input
-          type="text"
-          placeholder="Search product, supplier, order"
-          class="search-bar"
-        />
+        <div class="buscador">
+          <input
+            type="text"
+            placeholder="🔍 Buscar en tiendas"
+            class="input-buscador"
+            v-model="searchTerm"
+          />
+        </div>
         <div class="header-buttons">
-          <button @click="dialogType = 'supplier'; showDialog = true" class="add-supplier-btn">
+          <button class="add-supplier-btn" @click="toggleAddDialog">
             Add Supplier
           </button>
-          <button class="download-btn">Download all</button>
+          <button class="download-btn" @click="downloadAllSuppliers">Download all</button>
         </div>
       </section>
 
@@ -26,163 +29,253 @@
             <tr>
               <th>Supplier Name</th>
               <th>Product</th>
-              <th>Contact Number</th>
+              <th>categoria</th>
+              <th>Number</th>
               <th>Email</th>
               <th>Type</th>
-              <th>On the way</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="supplier in suppliers" :key="supplier.id">
-              <td>{{ supplier.name }}</td>
-              <td>{{ supplier.product }}</td>
-              <td>{{ supplier.contact }}</td>
+            <tr v-for="supplier in filteredSuppliers" :key="supplier.id">
+              <td>{{ supplier.nombre }}</td>
+              <td>{{ supplier.producto }}</td>
+              <td>{{ supplier.categoria }}</td>
+              <td>{{ supplier.numero }}</td>
               <td>{{ supplier.email }}</td>
-              <td :class="supplier.type === 'Taking Return' ? 'taking-return' : 'not-taking-return'">
-                {{ supplier.type }}
+              <td :class="supplier.tipo === 'Taking Return' ? 'taking-return' : 'not-taking-return'">
+                {{ supplier.tipo }}
               </td>
-              <td>{{ supplier.onTheWay }}</td>
+              <div class="edit-section">
+              <button class="edit-btn" @click="editSupplier(supplier)">Edit</button>
+              <button class="delete-btn" @click="deleteSupplier(supplier.id)">Delete</button>
+            </div>
             </tr>
           </tbody>
         </table>
       </section>
 
-      <!-- Paginación -->
-      <section class="pagination">
-        <button class="pagination-btn">Previous</button>
-        <span>Page {{ currentPage }} of {{ totalPages }}</span>
-        <button class="pagination-btn">Next</button>
-      </section>
-
       <!-- Diálogo -->
-      <div v-if="showDialog" class="dialog-overlay" @click.self="closeDialog">
-        <div class="dialog">
-          <h2 v-if="dialogType === 'supplier'">New Supplier</h2>
-          <form @submit.prevent="addSupplier()">
-            <!-- Campos para agregar proveedor -->
-            <div v-if="dialogType === 'supplier'">
-              <div class="form-group">
-                <label for="supplier-name">Supplier Name</label>
-                <input
-                  type="text"
-                  id="supplier-name"
-                  placeholder="Enter supplier name"
-                  v-model="newSupplier.name"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label for="product">Product</label>
-                <input
-                  type="text"
-                  id="product"
-                  placeholder="Enter product"
-                  v-model="newSupplier.product"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label for="category">Category</label>
-                <input
-                  type="text"
-                  id="category"
-                  placeholder="Select product category"
-                  v-model="newSupplier.category"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label for="buying-price">Buying Price</label>
-                <input
-                  type="number"
-                  id="buying-price"
-                  placeholder="Enter buying price"
-                  v-model="newSupplier.buyingPrice"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label for="contact-number">Contact Number</label>
-                <input
-                  type="text"
-                  id="contact-number"
-                  placeholder="Enter supplier contact number"
-                  v-model="newSupplier.contactNumber"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label for="type">Type</label>
-                <select id="type" v-model="newSupplier.type" required>
+      <div v-if="showAddDialog" class="modal-overlay">
+        <div class="modal">
+          <h2>Add New supplier</h2>
+          <form @submit.prevent="submitNewsuppiler">
+            <div>
+              <label for="nombre">Nombre:</label>
+              <input type="text" id="nombre" v-model="newSupplier.nombre" required />
+            </div>
+            <div>
+              <label for="producto">Product:</label>
+              <input type="text" id="producto" v-model="newSupplier.producto" required />
+            </div>
+            <div>
+              <label for="categoria">Category:</label>
+              <input type="text" id="categoria" v-model="newSupplier.categoria" required />
+            </div>
+            <div>
+              <label for="numero">Number:</label>
+              <input type="text" id="numero" v-model="newSupplier.numero" required />
+            </div>
+            <div>
+              <label for="email">email:</label>
+              <input type="email" id="email" v-model="newSupplier.email" required />
+            </div>
+            <div>
+              <label for="text">Type</label>
+                <select id="tipo" v-model="newSupplier.tipo" required>
                   <option disabled value="">Select type</option>
                   <option value="Not taking return">Not taking return</option>
                   <option value="Taking return">Taking return</option>
                 </select>
-              </div>
             </div>
-            <div class="form-buttons">
-              <button type="submit" class="submit-btn">Add Supplier</button>
-              <button type="button" class="cancel-btn" @click="closeDialog">Discard</button>
+            <div class="modal-actions">
+              <button type="submit">Add Supplier</button>
+              <button type="button" @click="toggleAddDialog">Cancel</button>
             </div>
           </form>
         </div>
       </div>
+
+      <div v-if="showEditDialog" class="modal-overlay">
+      <div class="modal">
+        <h2>Edit Supplier</h2>
+        <form @submit.prevent="submitEditSupplier">
+          <div>
+            <label for="edit-nombre">Namem:</label>
+            <input type="text" id="edit-nombre" v-model="editData.nombre" required />
+          </div>
+          <div>
+            <label for="edit-producto">Product:</label>
+            <input type="text" id="edit-producto" v-model="editData.producto" required />
+          </div>
+          <div>
+            <label for="edit-categoria">Category:</label>
+            <input type="text" id="edit-categoria" v-model="editData.categoria" required />
+          </div>
+          <div>
+            <label for="edit-numero">Number:</label>
+            <input type="text" id="edit-numero" v-model="editData.numero" required />
+          </div>
+          <div>
+            <label for="edit-email">Email:</label>
+            <input type="email" id="edit-email" v-model="editData.email" required />
+          </div>
+          <div>
+              <label for="edit-tipo">Type</label>
+                <select type="text" id="tipo" v-model="editData.tipo" required>
+                  <option disabled value="">Select type</option>
+                  <option value="Not taking return">Not taking return</option>
+                  <option value="Taking return">Taking return</option>
+                </select>
+            </div>
+          <div class="modal-actions">
+            <button type="submit">Save Changes</button>
+            <button type="button" @click="toggleEditDialog">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
     </div>
   </div>
 </template>
 
 <script>
+import axios from "axios";
 import Userbar from "@/components/Userbar.vue";
 import BarraLateral from "../components/BarraLateral.vue";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 export default {
   components: {
-  Userbar,
-  BarraLateral,
-},
+    Userbar,
+    BarraLateral,
+  },
   data() {
     return {
-      suppliers: [
-        { id: 1, name: "Richard Martin", product: "Kit Kat", contact: "7687764556", email: "richard@gmail.com", type: "Taking Return", onTheWay: 13 },
-        { id: 2, name: "Tom Homan", product: "Maaza", contact: "9867545368", email: "tomhoman@gmail.com", type: "Taking Return", onTheWay: null },
-        { id: 3, name: "Veandir", product: "Dairy Milk", contact: "9867545566", email: "veandir@gmail.com", type: "Not Taking Return", onTheWay: null },
-        // Agrega más datos según lo necesario
-      ],
-      showDialog: false,
-      dialogType: null, // Indica si es 'product' o 'supplier'
+      suppliers: [],
+      showAddDialog: false,
+      showEditDialog: false,
+      searchTerm: "",
       newSupplier: {
-        name: "",
-        product: "",
-        category: "",
-        buyingPrice: null,
-        contactNumber: "",
-        type: "",
+        nombre: "",
+        producto: "",
+        categoria: "",
+        numero: "",
+        email: "",
+        tipo: "",
       },
-      currentPage: 1,
-      totalPages: 10,
+      editData: null,
     };
   },
+  computed: {
+    filteredSuppliers() {
+      // Convierte el término de búsqueda a minúsculas para comparación sin sensibilidad a mayúsculas
+      const search = this.searchTerm.toLowerCase();
+
+      // Filtra las tiendas que contengan la palabra clave en cualquiera de sus campos
+      return this.suppliers.filter((supplier) =>
+        Object.values(supplier).some((value) =>
+          String(value).toLowerCase().includes(search)
+        )
+      );
+    },
+  },
   methods: {
-    addSupplier() {
-      // Lógica para agregar un proveedor (puedes adaptarlo a tu sistema)
-      console.log("Nuevo Proveedor:", this.newSupplier);
-      this.resetSupplierForm();
-      this.closeDialog();
+    toggleAddDialog() {
+      this.showAddDialog = !this.showAddDialog;
+    },
+    toggleEditDialog() {
+      this.showEditDialog = !this.showEditDialog;
+    },
+    async deleteSupplier(supplierId) {
+      const confirmation = confirm("¿Estás seguro de que deseas eliminar este proveedor?");
+      if (!confirmation) return;
+
+      try {
+        await axios.delete(`proveedor/delete/${supplierId}`);
+        this.suppliers = this.suppliers.filter((supplier) => supplier.id !== supplierId); // Eliminar tienda de la lista local
+        alert("Proveedor eliminado con éxito.");
+      } catch (error) {
+        console.error("Error al eliminar la tienda:", error.response?.data || error.message);
+        alert("Hubo un error al intentar eliminar la tienda.");
+      }
+    },
+    async listarproveedores() {
+      try {
+        const response = await axios.get("proveedor/list");
+        this.suppliers = response.data;
+        console.log(this.suppliers)
+      } catch (error) {
+        console.error("Hubo un error al obtener los datos:", error);
+      }
+    },
+    editSupplier(supplier) {
+      this.editData = { ...supplier }; // Clonar datos de la tienda
+      this.showEditDialog = true; // Mostrar el modal
+    },
+    async submitEditSupplier() {
+      try {
+        const response = await axios.put(`proveedor/update/${this.editData.id}`, this.editData);
+        const index = this.suppliers.findIndex((t) => t.id === this.editData.id);
+        if (index !== -1) this.suppliers[index] = response.data; // Actualizar lista
+        this.toggleEditDialog(); // Cerrar el modal
+      } catch (error) {
+        console.error("Error al actualizar la tienda:", error.response.data.error);
+      }
+    },
+    async submitNewsuppiler() {
+      try {
+        const response = await axios.post("/proveedor/add", this.newSupplier);
+        console.log("Nuevo proveedor agregado:", response.data);
+        this.suppliers.push(response.data); // Agregar la nueva tienda a la lista
+        this.toggleAddDialog(); // Cerrar el modal
+        this.newSupplier = {
+          nombre: "",
+          producto: "",
+          categoria: "",
+          numero: "",
+          email: "",
+          tipo: "",
+        }; // Limpiar el formulario
+      } catch (error) {
+        console.error("Error al agregar la tienda:", error.response.data.error);
+      }
+    },
+    async downloadAllSuppliers() {
+      const doc = new jsPDF();
+
+      // Título del documento
+      doc.setFontSize(16);
+      doc.text("Suppliers List", 10, 10);
+
+      // Crear datos de la tabla
+      const tableColumn = ["Name", "Product", "Category", "Number", "Email", "Type"];
+      const tableRows = this.suppliers.map((supplier) => [
+        supplier.nombre,
+        supplier.producto,
+        supplier.categoria,
+        supplier.numero,
+        supplier.email,
+        supplier.tipo,
+      ]);
+
+      // Agregar tabla al PDF
+      doc.autoTable({
+        head: [tableColumn],
+        body: tableRows,
+        startY: 20,
+      });
+
+      // Descargar PDF
+      doc.save("suppliers_list.pdf");
     },
     closeDialog() {
       this.showDialog = false;
       this.resetSupplierForm();
     },
-    resetSupplierForm() {
-      this.newSupplier = {
-        name: "",
-        product: "",
-        category: "",
-        buyingPrice: null,
-        contactNumber: "",
-        type: "",
-      };
-    },
+  },
+  mounted() {
+    this.listarproveedores();
   },
 };
 </script>
@@ -191,13 +284,14 @@ export default {
 .layout {
   display: flex;
   flex-direction: column;
+  margin-top: 60px;
+  margin-left: 10px;
 }
 
 .dashboard {
-  width: 1300px;
+  width: 1145px;
   max-width: 100%;
   margin: 0 auto;
-  margin-top: 50px;
   padding: 20px;
   background: #f9f9f9;
   border-radius: 8px;
@@ -276,12 +370,60 @@ export default {
   font-weight: normal;
 }
 
-
-
 .pagination {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+/* Estilo para la sección de botones de acción */
+.edit-section {
+  display: flex;
+  gap: 10px; /* Espaciado entre botones */
+  justify-content: flex-start; /* Alineación a la izquierda */
+  margin-top: 10px; /* Espaciado superior */
+}
+
+/* Estilo para el botón de editar */
+.edit-btn {
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  color: #fff; /* Texto blanco */
+  background-color: #0787ff; /* Amarillo */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.edit-btn:hover {
+  background-color: #004ee0; /* Amarillo más oscuro al pasar el cursor */
+  transform: scale(1.05); /* Efecto de crecimiento */
+}
+
+.edit-btn:active {
+  transform: scale(0.95); /* Efecto de pulsación */
+}
+
+/* Estilo para el botón de borrar */
+.delete-btn {
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  color: #fff; /* Texto blanco */
+  background-color: #dc3545; /* Rojo */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.delete-btn:hover {
+  background-color: #c82333; /* Rojo más oscuro al pasar el cursor */
+  transform: scale(1.05); /* Efecto de crecimiento */
+}
+
+.delete-btn:active {
+  transform: scale(0.95); /* Efecto de pulsación */
 }
 
 .pagination-btn {
@@ -380,6 +522,15 @@ export default {
   order: 2;  /* Este botón será el segundo */
 }
 
+.input-buscador {
+  width: 100%;
+  padding: 10px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: white;
+}
+
 .cancel-btn {
   background-color: #f5f5f5;
   color: #333;
@@ -397,5 +548,114 @@ export default {
 .submit-btn:hover {
   background-color: #0056b3;
 }
+
+/* Estilo para la superposición de fondo */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Asegura que esté sobre otros elementos */
+}
+
+/* Estilo para el diálogo */
+.modal {
+  background: #fff; /* Fondo blanco */
+  border-radius: 8px; /* Bordes redondeados */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+  padding: 20px; /* Espaciado interno */
+  width: 90%; /* Tamaño adaptable */
+  max-width: 500px; /* Tamaño máximo */
+  animation: fadeIn 0.3s ease-out; /* Animación de aparición */
+}
+
+/* Título del diálogo */
+.modal h2 {
+  margin-bottom: 20px; /* Espaciado inferior */
+  font-size: 1.5rem;
+  color: #333;
+}
+
+/* Estilo para los formularios */
+.modal form {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal form div {
+  margin-bottom: 15px; /* Espaciado entre campos */
+}
+
+.modal form label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+.modal form input,
+.modal form select {
+  width: 450px;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.modal form input:focus,
+.modal form select:focus {
+  border-color: #007bff; /* Color azul al enfocarse */
+  outline: none;
+}
+
+/* Botones dentro del diálogo */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modal-actions button {
+  padding: 8px 15px;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.modal-actions button[type="submit"] {
+  background-color: #007bff; /* Azul */
+  color: #fff;
+}
+
+.modal-actions button[type="button"] {
+  background-color: #dc3545; /* Rojo */
+  color: #fff;
+}
+
+.modal-actions button:hover {
+  opacity: 0.9;
+}
+
+/* Animación de aparición */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 
 </style>

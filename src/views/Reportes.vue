@@ -1,47 +1,53 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <div class="layout">
-    <Userbar/>
+    <Userbar />
     <BarraLateral />
-    <div class="dashboard">
-    <!-- Overview Section -->
-    <section class="overview">
-      <h2>Overview</h2>
-      <div class="stats">
-        <div>Total Products Purchase Value: ₹{{ totalProductPurchaseValue }}</div>
-        <div>Total Orders Value: ₹{{ totalOrdersValue }}</div>
-        <div>Profit: ₹{{ profit }}</div>
-      </div>
-    </section>
+    <!-- Mostrar loader mientras los datos cargan -->
+    <div v-if="!dataLoaded" class="loader">
+      <p>Loading...</p>
+    </div>
+    <!-- Mostrar contenido principal solo cuando los datos estén listos -->
+    <div v-else class="dashboard">
+      <!-- Overview Section -->
+      <section class="overview">
+        <h2>Overview</h2>
+        <div class="stats">
+          <div>Total Products Purchase Value: ₹{{ totalProductPurchaseValue }}</div>
+          <div>Total Orders Value: ₹{{ totalOrdersValue }}</div>
+          <div>Profit: ₹{{ profit }}</div>
+        </div>
+      </section>
 
-    <!-- Best Selling Category Section -->
-    <section class="best-selling-category">
-      <h2>Best Selling Category</h2>
-      <ul>
-        <li v-for="product in bestSellingCategories" :key="product.id">
-          {{ product.categoria }} - Threshold Value: {{ product.valorUmbral }}
-        </li>
-      </ul>
-    </section>
+      <!-- Best Selling Category Section -->
+      <section class="best-selling-category">
+        <h2>Best Selling Category</h2>
+        <ul>
+          <li v-for="product in bestSellingCategories" :key="product.id">
+            {{ product.categoria }} - Threshold Value: {{ product.valorUmbral }}
+          </li>
+        </ul>
+      </section>
 
-    <!-- Profit & Revenue Section -->
-    <section class="profit-revenue">
-      <h2>Profit & Revenue</h2>
-      <line-chart :chart-data="chartData" />
-    </section>
+      <!-- Profit & Revenue Section -->
+      <section class="profit-revenue">
+        <h2>Profit & Revenue</h2>
+        <line-chart :chart-data="chartData" />
+      </section>
 
-    <!-- Best Selling Product Section -->
-    <section class="best-selling-product">
-      <h2>Best Selling Products</h2>
-      <ul>
-        <li v-for="product in bestSellingProducts" :key="product.id">
-          {{ product.nombre }} - Remaining Quantity: {{ product.cantidad }}
-        </li>
-      </ul>
-    </section>
-  </div>
+      <!-- Best Selling Product Section -->
+      <section class="best-selling-product">
+        <h2>Best Selling Products</h2>
+        <ul>
+          <li v-for="product in bestSellingProducts" :key="product.id">
+            {{ product.nombre }} - Remaining Quantity: {{ product.cantidad }}
+          </li>
+        </ul>
+      </section>
+    </div>
   </div>
 </template>
+
 
 <script>
 import Userbar from "@/components/Userbar.vue";
@@ -57,6 +63,7 @@ export default {
   },
   data() {
     return {
+      dataLoaded: false,
       products: [],
       orders: [],
       totalProductPurchaseValue: 0,
@@ -73,6 +80,7 @@ export default {
     this.getBestSellingCategories();
     this.getBestSellingProducts();
     this.prepareChartData();
+    this.dataLoaded = true; 
   },
   methods: {
     async fetchData() {
@@ -176,7 +184,7 @@ html, body {
 
 /* Dashboard general */
 .dashboard {
-  width: 1150px;
+  width: 1160px;
   max-width: 1300px;
   min-height: 100vh;
   margin: 0 auto;
