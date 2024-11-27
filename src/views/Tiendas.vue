@@ -91,6 +91,8 @@
             <button type="button" @click="toggleAddStoreDialog">Cancel</button>
           </div>
         </form>
+        <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+        <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
       </div>
     </div>
 
@@ -128,6 +130,8 @@
             <button type="button" @click="toggleEditStoreDialog">Cancel</button>
           </div>
         </form>
+        <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+        <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
       </div>
     </div>
   </div>
@@ -158,6 +162,8 @@ export default {
         gerente: "",
       },
       editStoreData: null,
+      errorMessage: "",
+      successMessage: "",
     };
   },
   computed: {
@@ -197,9 +203,16 @@ export default {
         const response = await axios.put(`/tienda/update/${this.editStoreData.id}`, this.editStoreData);
         const index = this.tiendas.findIndex((t) => t.id === this.editStoreData.id);
         if (index !== -1) this.tiendas[index] = response.data; // Actualizar lista
+        this.successMessage = "Tienda editada exitosamente.";
+        this.errorMessage = "";
         this.toggleEditStoreDialog(); // Cerrar el modal
       } catch (error) {
-        console.error("Error al actualizar la tienda:", error.response.data.error);
+        if (error.response && error.response.data) {
+            this.errorMessage = error.response.data.error;
+          } else {
+            this.errorMessage = "Ocurrió un error inesperado.";
+          }
+          this.successMessage = "";
       }
     },
     async submitNewStore() {
@@ -216,8 +229,15 @@ export default {
           direccion: "",
           gerente: "",
         }; // Limpiar el formulario
+        this.successMessage = "Tienda registrada exitosamente.";
+        this.errorMessage = "";
       } catch (error) {
-        console.error("Error al agregar la tienda:", error.response.data.error);
+        if (error.response && error.response.data) {
+            this.errorMessage = error.response.data.error;
+          } else {
+            this.errorMessage = "Ocurrió un error inesperado.";
+          }
+          this.successMessage = "";
       }
     },
     async deleteStore(storeId) {
@@ -227,7 +247,6 @@ export default {
       try {
         await axios.delete(`/tienda/delete/${storeId}`);
         this.tiendas = this.tiendas.filter((tienda) => tienda.id !== storeId); // Eliminar tienda de la lista local
-        alert("Tienda eliminada con éxito.");
       } catch (error) {
         console.error("Error al eliminar la tienda:", error.response?.data || error.message);
         alert("Hubo un error al intentar eliminar la tienda.");
@@ -332,7 +351,16 @@ export default {
   overflow-y: auto;
   padding-bottom: 24px;
 }
-
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 10px;
+  }
+  .success-message {
+    color: green;
+    font-size: 14px;
+    margin-top: 10px;
+  }
 /* Estilizar la barra de scroll */
 .stores-container::-webkit-scrollbar {
   width: 8px;
