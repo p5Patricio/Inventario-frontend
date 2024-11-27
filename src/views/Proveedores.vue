@@ -29,7 +29,7 @@
             <tr>
               <th>Supplier Name</th>
               <th>Product</th>
-              <th>categoria</th>
+              <th>Category</th>
               <th>Number</th>
               <th>Email</th>
               <th>Type</th>
@@ -60,7 +60,7 @@
           <h2>Add New supplier</h2>
           <form @submit.prevent="submitNewsuppiler">
             <div>
-              <label for="nombre">Nombre:</label>
+              <label for="nombre">Name:</label>
               <input type="text" id="nombre" v-model="newSupplier.nombre" required />
             </div>
             <div>
@@ -76,11 +76,11 @@
               <input type="text" id="numero" v-model="newSupplier.numero" required />
             </div>
             <div>
-              <label for="email">email:</label>
+              <label for="email">Email:</label>
               <input type="email" id="email" v-model="newSupplier.email" required />
             </div>
             <div>
-              <label for="text">Type</label>
+              <label for="text">Type:</label>
                 <select id="tipo" v-model="newSupplier.tipo" required>
                   <option disabled value="">Select type</option>
                   <option value="Not taking return">Not taking return</option>
@@ -102,7 +102,7 @@
         <h2>Edit Supplier</h2>
         <form @submit.prevent="submitEditSupplier">
           <div>
-            <label for="edit-nombre">Namem:</label>
+            <label for="edit-nombre">Name:</label>
             <input type="text" id="edit-nombre" v-model="editData.nombre" required />
           </div>
           <div>
@@ -122,7 +122,7 @@
             <input type="email" id="edit-email" v-model="editData.email" required />
           </div>
           <div>
-              <label for="edit-tipo">Type</label>
+              <label for="edit-tipo">Type:</label>
                 <select type="text" id="tipo" v-model="editData.tipo" required>
                   <option disabled value="">Select type</option>
                   <option value="Not taking return">Not taking return</option>

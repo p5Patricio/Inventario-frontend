@@ -11,7 +11,7 @@
         <div class="buscador">
           <input
             type="text"
-            placeholder="🔍 Buscar en tiendas"
+            placeholder="🔍 serch in stores"
             class="input-buscador"
             v-model="searchTerm"
           />
@@ -37,14 +37,14 @@
             </div>
 
             <div class="store-details">
-              <h3>Nombre: {{ tienda.nombre }}</h3>
+              <h3>Name: {{ tienda.nombre }}</h3>
               <div class="store-info">
-                <p class="store-name">Gerente: {{ tienda.gerente }}</p>
-                <p class="store-location"> Ciudad y municipio: 
+                <p class="store-name">Manager: {{ tienda.gerente }}</p>
+                <p class="store-location"> city and municipality: 
                   {{ tienda.estado }} - {{ tienda.municipio }}
                 </p>
-                <p class="store-address">Direccion: {{ tienda.direccion }}</p>
-                <p class="store-phone">Numero: {{ tienda.numero }}</p>
+                <p class="store-address">Address: {{ tienda.direccion }}</p>
+                <p class="store-phone">Number: {{ tienda.numero }}</p>
               </div>
             </div>
 
@@ -63,27 +63,27 @@
         <h2>Add New Store</h2>
         <form @submit.prevent="submitNewStore">
           <div>
-            <label for="nombre">Nombre:</label>
+            <label for="nombre">Name:</label>
             <input type="text" id="nombre" v-model="newStore.nombre" required />
           </div>
           <div>
-            <label for="numero">Número:</label>
+            <label for="numero">Number:</label>
             <input type="text" id="numero" v-model="newStore.numero" required />
           </div>
           <div>
-            <label for="estado">Estado:</label>
+            <label for="estado">City:</label>
             <input type="text" id="estado" v-model="newStore.estado" required />
           </div>
           <div>
-            <label for="municipio">Municipio:</label>
+            <label for="municipio">Municipality:</label>
             <input type="text" id="municipio" v-model="newStore.municipio" required />
           </div>
           <div>
-            <label for="direccion">Dirección:</label>
+            <label for="direccion">Address:</label>
             <input type="text" id="direccion" v-model="newStore.direccion" required />
           </div>
           <div>
-            <label for="gerente">Gerente:</label>
+            <label for="gerente">Manager:</label>
             <input type="text" id="gerente" v-model="newStore.gerente" required />
           </div>
           <div class="modal-actions">
@@ -102,27 +102,27 @@
         <h2>Edit Store</h2>
         <form @submit.prevent="submitEditStore">
           <div>
-            <label for="edit-nombre">Nombre:</label>
+            <label for="edit-nombre">Name:</label>
             <input type="text" id="edit-nombre" v-model="editStoreData.nombre" required />
           </div>
           <div>
-            <label for="edit-numero">Número:</label>
+            <label for="edit-numero">Number:</label>
             <input type="text" id="edit-numero" v-model="editStoreData.numero" required />
           </div>
           <div>
-            <label for="edit-estado">Estado:</label>
+            <label for="edit-estado">City:</label>
             <input type="text" id="edit-estado" v-model="editStoreData.estado" required />
           </div>
           <div>
-            <label for="edit-municipio">Municipio:</label>
+            <label for="edit-municipio">Municipality:</label>
             <input type="text" id="edit-municipio" v-model="editStoreData.municipio" required />
           </div>
           <div>
-            <label for="edit-direccion">Dirección:</label>
+            <label for="edit-direccion">Address:</label>
             <input type="text" id="edit-direccion" v-model="editStoreData.direccion" required />
           </div>
           <div>
-            <label for="edit-gerente">Gerente:</label>
+            <label for="edit-gerente">Manager:</label>
             <input type="text" id="edit-gerente" v-model="editStoreData.gerente" required />
           </div>
           <div class="modal-actions">

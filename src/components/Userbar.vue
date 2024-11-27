@@ -5,7 +5,7 @@
     <div class="user-bar">
       <span class="icon">👤</span>
       <span class="user-name" @click="openUserDialog">
-        {{ nombreusuario || "Usuario" }}
+        details: {{ nombreusuario || "Usuario" }}
       </span>
     </div>
 

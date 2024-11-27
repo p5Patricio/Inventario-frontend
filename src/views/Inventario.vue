@@ -1,58 +1,73 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <div class="layout">
-    <Userbar />
+    <!-- Barra lateral -->
     <BarraLateral />
-    <div class="contenido-principal">
+
+    <!-- Contenido principal -->
+    <div class="main-content">
       <!-- Barra de búsqueda -->
-      <div class="search-bar">
-        <input
-          type="text"
-          placeholder="Buscar producto, proveedor, pedido"
-          v-model="searchTerm"
-          @input="filterProducts"
-        />
+      <div class="header-container">
+        <div class="buscador">
+          <input
+            type="text"
+            placeholder="🔍 Search product"
+            class="input-buscador"
+            v-model="searchTerm"
+            @input="filterProducts"
+          />
+        </div>
+        <Userbar />
       </div>
 
-      <!-- Overall Inventory -->
-      <div class="overall-inventory">
-        <div class="summary-card">
-          <h2>Categorías</h2>
-          <p>{{ categories }}</p>
-          <small>Últimos 7 días</small>
+      <!-- Resumen general del inventario -->
+      <section class="overview">
+        <div class="overview-card">
+          <h2>Overall Inventory</h2>
+          <div class="overview-info">
+            <div class="info">
+              <h3>Total Categories</h3>
+              <p>{{ categories }}</p>
+              <span>Unique categories</span>
+            </div>
+            <div class="info">
+              <h4>Total Products</h4>
+              <p>{{ totalProducts }}</p>
+              <span>Total number of products</span>
+            </div>
+            <div class="info">
+              <h5>Top Selling</h5>
+              <p>{{ topSelling.nombre || "N/A" }}</p>
+              <span>Best-selling product</span>
+            </div>
+            <div class="info">
+              <h6>Low Stock</h6>
+              <p>{{ lowStock }}</p>
+              <span>Products below threshold</span>
+            </div>
+          </div>
         </div>
-        <div class="summary-card">
-          <h2>Total Productos</h2>
-          <p>{{ totalProducts }}</p>
-          <small>Últimos 7 días</small>
-        </div>
-        <div class="summary-card">
-          <h2>Más Vendidos</h2>
-          <p>{{ topSelling }}</p>
-          <small>Últimos 7 días</small>
-        </div>
-        <div class="summary-card">
-          <h2>Bajo Stock</h2>
-          <p>{{ lowStock }}</p>
-          <small>Pedido/No en stock</small>
-        </div>
-      </div>
+      </section>
 
-      <!-- Tabla de productos y botón -->
-      <div class="table-container">
-        <button class="add-product-btn" @click="toggleAddProductDialog">
-          Agregar Producto
-        </button>
-        <div class="product-table" v-if="!showProductDetails">
+      <!-- Tabla de productos -->
+      <section class="orders">
+        <div class="orders-card">
+          <div class="orders-card2">
+            <h2>Products</h2>
+            <div class="actions">
+              <button class="add-btn" @click="toggleAddProductDialog">Add Product</button>
+              <button class="download-btn" @click="downloadAllProducts">Download All</button>
+            </div>
+          </div>
           <table>
             <thead>
               <tr>
-                <th>Producto</th>
-                <th>Precio de Compra</th>
-                <th>Cantidad</th>
-                <th>Umbral</th>
-                <th>Fecha de Caducidad</th>
-                <th>Disponibilidad</th>
+                <th>Product</th>
+                <th>Buying Price</th>
+                <th>Quantity</th>
+                <th>Threshold Value</th>
+                <th>Expiry Date</th>
+                <th>Availability</th>
               </tr>
             </thead>
             <tbody>
@@ -63,15 +78,15 @@
                 style="cursor: pointer;"
               >
                 <td>{{ item.nombre }}</td>
-                <td>${{ item.precioCompra }}</td>
+                <td>₹{{ item.precioCompra }}</td>
                 <td>{{ item.cantidad }}</td>
                 <td>{{ item.valorUmbral }}</td>
                 <td>{{ item.fechaVencimiento || "N/A" }}</td>
                 <td
                   :class="{
-                    'in-stock': item.estadoDisponibilidad === 'En existencia',
-                    'out-of-stock': item.estadoDisponibilidad === 'Agotado',
-                    'low-stock': item.estadoDisponibilidad === 'Bajo stock',
+                    'in-stock': item.estadoDisponibilidad === 'In-stock',
+                    'out-of-stock': item.estadoDisponibilidad === 'Out of stock',
+                    'low-stock': item.estadoDisponibilidad === 'Low stock',
                   }"
                 >
                   {{ item.estadoDisponibilidad }}
@@ -80,53 +95,132 @@
             </tbody>
           </table>
         </div>
-      </div>
+      </section>
 
       <!-- Modal para agregar producto -->
       <div v-if="showAddProductDialog" class="modal-overlay">
         <div class="modal">
-          <h2>Agregar Producto</h2>
-          <form @submit.prevent="submitNewProduct">
-            <div>
-              <label for="imagenUrl">URL de la Imagen:</label>
+          <h2 class="modal-title">New Product</h2>
+          <form @submit.prevent="submitNewProduct" class="form-container">
+            <!-- Carga de imagen -->
+            <div class="form-group image-upload">
+              <label for="imagen">
+                <div class="image-placeholder">
+                  <span v-if="!newProduct.imagen">Drag image here or</span>
+                  <span v-if="!newProduct.imagen" class="browse-link">Browse image</span>
+                  <img
+                    v-if="newProduct.imagenPreview"
+                    :src="newProduct.imagenPreview"
+                    alt="Preview"
+                  />
+                </div>
+              </label>
               <input
-                type="text"
-                id="imagenUrl"
-                v-model="newProduct.imagenUrl"
-                placeholder="Ingrese URL de la imagen"
+                type="file"
+                id="imagen"
+                @change="handleImageUpload"
+                accept="image/*"
+                hidden
               />
             </div>
-            <div>
-              <label for="nombre">Nombre del Producto:</label>
-              <input type="text" id="nombre" v-model="newProduct.nombre" required />
+
+            <!-- Campos del formulario -->
+            <div class="form-group">
+              <label for="nombre">Product Name</label>
+              <input
+                type="text"
+                id="nombre"
+                v-model="newProduct.nombre"
+                placeholder="Enter product name"
+                required
+              />
             </div>
-            <div>
-              <label for="categoria">Categoría:</label>
-              <input type="text" id="categoria" v-model="newProduct.categoria" required />
+
+            <div class="form-group">
+              <label for="categoria">Category</label>
+              <input
+                type="text"
+                id="categoria"
+                v-model="newProduct.categoria"
+                placeholder="Enter product category"
+                required
+              />
             </div>
-            <div>
-              <label for="precioCompra">Precio de Compra:</label>
-              <input type="number" id="precioCompra" v-model="newProduct.precioCompra" required />
+
+            <div class="form-group">
+              <label for="precioCompra">Buying Price</label>
+              <input
+                type="number"
+                id="precioCompra"
+                v-model="newProduct.precioCompra"
+                placeholder="Enter buying price"
+                required
+              />
             </div>
-            <div>
-              <label for="cantidad">Cantidad:</label>
-              <input type="number" id="cantidad" v-model="newProduct.cantidad" required />
+
+            <div class="form-group">
+              <label for="cantidad">Quantity</label>
+              <input
+                type="number"
+                id="cantidad"
+                v-model="newProduct.cantidad"
+                placeholder="Enter product quantity"
+                required
+              />
             </div>
-            <div>
-              <label for="unidad">Unidad:</label>
-              <input type="text" id="unidad" v-model="newProduct.unidad" required />
+
+            <div class="form-group">
+              <label for="unidad">Unit</label>
+              <input
+                type="text"
+                id="unidad"
+                v-model="newProduct.unidad"
+                placeholder="Enter product unit"
+                required
+              />
             </div>
-            <div>
-              <label for="fechaVencimiento">Fecha de Caducidad:</label>
-              <input type="date" id="fechaVencimiento" v-model="newProduct.fechaVencimiento" />
+
+            <div class="form-group">
+              <label for="fechaVencimiento">Expiry Date</label>
+              <input
+                type="date"
+                id="fechaVencimiento"
+                v-model="newProduct.fechaVencimiento"
+                placeholder="Enter expiry date"
+              />
             </div>
-            <div>
-              <label for="valorUmbral">Umbral:</label>
-              <input type="number" id="valorUmbral" v-model="newProduct.valorUmbral" required />
+
+            <div class="form-group">
+              <label for="fechadeventa">Buying Date</label>
+              <input
+                type="date"
+                id="fechadeventa"
+                v-model="newProduct.fechadeventa"
+                placeholder="Enter buying date"
+              />
             </div>
+
+            <div class="form-group">
+              <label for="valorUmbral">Threshold Value</label>
+              <input
+                type="number"
+                id="valorUmbral"
+                v-model="newProduct.valorUmbral"
+                placeholder="Enter threshold value"
+                required
+              />
+            </div>
+
+            <!-- Botones del formulario -->
             <div class="modal-actions">
-              <button type="submit">Agregar Producto</button>
-              <button type="button" @click="toggleAddProductDialog">Cancelar</button>
+              <button type="submit" class="add-btn">Add Product</button>
+              <button
+                type="button"
+                @click="toggleAddProductDialog"
+                class="discard-btn"
+              >
+                Discard
+              </button>
             </div>
           </form>
         </div>
@@ -137,6 +231,8 @@
         v-if="showProductDetails"
         :product="selectedProduct"
         @close="closeProductDetails"
+        @update="handleProductUpdate"
+        @delete="handleProductDelete"
       />
     </div>
   </div>
@@ -144,9 +240,11 @@
 
 <script>
 import axios from "axios";
-import BarraLateral from "../components/BarraLateral.vue";
 import Userbar from "@/components/Userbar.vue";
+import BarraLateral from "@/components/BarraLateral.vue";
 import ProductDetails from "@/components/ProductDetails.vue";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 export default {
   components: {
@@ -163,17 +261,19 @@ export default {
       selectedProduct: null,
       categories: 0,
       totalProducts: 0,
-      topSelling: 0,
+      topSelling: {},
       lowStock: 0,
       newProduct: {
-        imagenUrl: "",
         nombre: "",
         categoria: "",
         precioCompra: 0,
         cantidad: 0,
         unidad: "",
         fechaVencimiento: "",
+        fechadeventa: "",
         valorUmbral: 0,
+        imagen: null,
+        imagenPreview: null,
       },
     };
   },
@@ -192,49 +292,85 @@ export default {
         const response = await axios.get("http://localhost:3000/api/productos");
         this.inventario = response.data.map((doc) => ({
           id: doc.id,
-          nombre: doc.nombre || "Sin nombre",
-          precioCompra: doc.precioCompra || 0,
-          cantidad: doc.cantidad || 0,
-          valorUmbral: doc.valorUmbral || 0,
-          fechaVencimiento: doc.fechaVencimiento || null,
-          estadoDisponibilidad: doc.estadoDisponibilidad || "N/A",
-          imagenUrl: doc.imagenUrl || "",
-          nombreProveedor: doc.nombreProveedor || "",
-          contactoProveedor: doc.contactoProveedor || "",
+          ...doc,
         }));
         this.updateSummary();
       } catch (error) {
-        console.error("Hubo un error al obtener los datos:", error);
+        console.error("Error fetching inventory:", error);
       }
     },
     updateSummary() {
-      this.categories = new Set(this.inventario.map((item) => item.categoria)).size;
+      this.categories = new Set(
+        this.inventario.map((item) => item.categoria)
+      ).size;
       this.totalProducts = this.inventario.length;
-      this.topSelling = Math.floor(Math.random() * this.totalProducts); // Ejemplo aleatorio
-      this.lowStock = this.inventario.filter((item) => item.cantidad < item.valorUmbral).length;
+      this.topSelling = this.inventario.reduce(
+        (prev, current) =>
+          (prev.ventas || 0) > (current.ventas || 0) ? prev : current,
+        {}
+      );
+      this.lowStock = this.inventario.filter(
+        (item) => item.cantidad < item.valorUmbral
+      ).length;
     },
     toggleAddProductDialog() {
       this.showAddProductDialog = !this.showAddProductDialog;
     },
+    handleImageUpload(event) {
+      const file = event.target.files[0];
+      this.newProduct.imagen = file;
+      this.newProduct.imagenPreview = URL.createObjectURL(file);
+    },
     async submitNewProduct() {
       try {
-        const response = await axios.post("http://localhost:3000/api/productos", this.newProduct);
-        this.inventario.push(response.data); // Agregar a la lista actual
+        const formData = new FormData();
+        formData.append("nombre", this.newProduct.nombre);
+        formData.append("categoria", this.newProduct.categoria);
+        formData.append("precioCompra", this.newProduct.precioCompra);
+        formData.append("cantidad", this.newProduct.cantidad);
+        formData.append("unidad", this.newProduct.unidad);
+        formData.append(
+          "fechaVencimiento",
+          this.newProduct.fechaVencimiento || ""
+        );
+        formData.append("fechadeventa", this.newProduct.fechadeventa || "");
+        formData.append("valorUmbral", this.newProduct.valorUmbral);
+        formData.append("imagenProducto", this.newProduct.imagen);
+
+        const response = await axios.post(
+          "http://localhost:3000/api/productos",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        this.inventario.push(response.data);
         this.toggleAddProductDialog();
-        this.newProduct = {
-          imagenUrl: "",
-          nombre: "",
-          categoria: "",
-          precioCompra: 0,
-          cantidad: 0,
-          unidad: "",
-          fechaVencimiento: "",
-          valorUmbral: 0,
-        };
+        this.resetNewProduct();
         this.updateSummary();
       } catch (error) {
-        console.error("Error al agregar el producto:", error.response?.data || error.message);
+        console.error(
+          "Error adding product:",
+          error.response?.data || error.message
+        );
       }
+    },
+    resetNewProduct() {
+      this.newProduct = {
+        nombre: "",
+        categoria: "",
+        precioCompra: 0,
+        cantidad: 0,
+        unidad: "",
+        fechaVencimiento: "",
+        fechadeventa: "",
+        valorUmbral: 0,
+        imagen: null,
+        imagenPreview: null,
+      };
     },
     selectProduct(product) {
       this.selectedProduct = product;
@@ -244,6 +380,60 @@ export default {
       this.selectedProduct = null;
       this.showProductDetails = false;
     },
+    handleProductUpdate(updatedProduct) {
+      const index = this.inventario.findIndex(
+        (product) => product.id === updatedProduct.id
+      );
+      if (index !== -1) {
+        this.inventario.splice(index, 1, updatedProduct);
+      }
+      this.updateSummary();
+      this.closeProductDetails();
+    },
+    handleProductDelete(productId) {
+      this.inventario = this.inventario.filter(
+        (product) => product.id !== productId
+      );
+      this.updateSummary();
+      this.closeProductDetails();
+    },
+    downloadAllProducts() {
+      const doc = new jsPDF();
+
+      // Título del documento
+      doc.setFontSize(16);
+      doc.text("Products List", 10, 10);
+
+      // Crear datos de la tabla
+      const tableColumn = [
+        "Product",
+        "Category",
+        "Buying Price",
+        "Quantity",
+        "Threshold Value",
+        "Expiry Date",
+        "Availability",
+      ];
+      const tableRows = this.inventario.map((product) => [
+        product.nombre,
+        product.categoria,
+        `₹${product.precioCompra}`,
+        product.cantidad,
+        product.valorUmbral,
+        product.fechaVencimiento || "N/A",
+        product.estadoDisponibilidad,
+      ]);
+
+      // Agregar tabla al PDF
+      doc.autoTable({
+        head: [tableColumn],
+        body: tableRows,
+        startY: 20,
+      });
+
+      // Descargar PDF
+      doc.save("products_list.pdf");
+    },
   },
   mounted() {
     this.listarinventario();
@@ -252,78 +442,206 @@ export default {
 </script>
 
 <style scoped>
+/* Layout principal */
 .layout {
   display: flex;
   min-height: 100vh;
 }
 
+/* Contenido principal */
 .contenido-principal {
   flex: 1;
-  margin-left: 230px;
   padding: 20px;
+  background-color: #f8f9fa; /* Fondo gris claro */
 }
 
-.search-bar {
+/* Barra de búsqueda y botones de acciones */
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
 }
 
-.overall-inventory {
+.buscador {
+  flex: 1;
+  max-width: 400px;
+}
+
+.input-buscador {
+  width: 100%;
+  padding: 10px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: white;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.input-buscador::placeholder {
+  color: #aaa;
+  font-style: italic;
+}
+
+.input-buscador:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  outline: none;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* Botón de agregar producto */
+.add-btn {
+  background-color: #0052cc;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.add-btn:hover {
+  background-color: #003d99;
+}
+
+/* Botón de descargar productos */
+.download-btn {
+  background-color: transparent;
+  border: 1px solid #ccc;
+  color: #555;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.download-btn:hover {
+  color: #000;
+  border-color: #888;
+}
+
+/* Resumen general */
+.overview {
   display: flex;
   justify-content: space-between;
   margin-bottom: 20px;
 }
 
-.summary-card {
+.overview-card {
   flex: 1;
-  background: #f8fafc;
+  background: #ffffff;
   padding: 20px;
   margin: 5px;
-  border-radius: 8px;
+  border-radius: 10px;
   text-align: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.table-container {
-  position: relative;
+.overview-card h2 {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
 }
 
-.add-product-btn {
-  position: absolute;
-  right: 0;
-  top: -50px;
-  background: #0052cc;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+.overview-info {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 20px;
 }
 
-.add-product-btn:hover {
-  background: #003d99;
+.info {
+  text-align: center;
 }
 
-.product-table {
+.info h3, .info h4, .info h5, .info h6 {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.info p {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.info span {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* Tabla de productos */
+.orders {
   margin-top: 20px;
 }
 
-.product-table table {
+.orders-card {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.orders-card2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.orders-card h2 {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.orders-card table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.product-table th,
-.product-table td {
-  padding: 10px;
+.orders-card th,
+.orders-card td {
+  padding: 12px 10px;
   text-align: left;
   border-bottom: 1px solid #e5e7eb;
 }
 
-tbody tr:hover {
+.orders-card thead th {
+  background-color: #f1f5f9;
+  color: #6b7280;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.orders-card tbody tr:hover {
   background-color: #f3f4f6;
   cursor: pointer;
 }
 
+.in-stock {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.out-of-stock {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.low-stock {
+  color: #ffc107;
+  font-weight: bold;
+}
+
+/* Modal */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -334,12 +652,120 @@ tbody tr:hover {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000;
 }
 
 .modal {
   background: white;
-  padding: 20px;
+  padding: 30px;
   border-radius: 8px;
-  width: 400px;
+  width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-title {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Imagen en el formulario */
+.image-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.image-placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 150px;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.image-placeholder img {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 8px;
+}
+
+.browse-link {
+  color: #007bff;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.form-group {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 15px;
+}
+
+.form-group label {
+  flex: 0 0 150px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  text-align: left;
+}
+
+.form-group input,
+.form-group select {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  width: 100%;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.modal-actions button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.add-btn-modal {
+  background-color: #0052cc;
+  color: white;
+}
+
+.add-btn-modal:hover {
+  background-color: #003d99;
+}
+
+.discard-btn {
+  background-color: #ddd;
+  color: black;
+}
+
+.discard-btn:hover {
+  background-color: #bbb;
 }
 </style>
