@@ -190,9 +190,13 @@ export default {
     },
     toggleAddStoreDialog() {
       this.showAddStoreDialog = !this.showAddStoreDialog;
+      this.errorMessage = "";
+      this.successMessage = "";
     },
     toggleEditStoreDialog() {
       this.showEditStoreDialog = !this.showEditStoreDialog;
+      this.errorMessage = "";
+      this.successMessage = "";
     },
     editStore(tienda) {
       this.editStoreData = { ...tienda }; // Clonar datos de la tienda

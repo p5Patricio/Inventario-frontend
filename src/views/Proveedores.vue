@@ -9,7 +9,7 @@
         <div class="buscador">
           <input
             type="text"
-            placeholder="🔍 Buscar en tiendas"
+            placeholder="🔍 Buscar en proveedores"
             class="input-buscador"
             v-model="searchTerm"
           />
@@ -92,6 +92,8 @@
               <button type="button" @click="toggleAddDialog">Cancel</button>
             </div>
           </form>
+          <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+          <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
         </div>
       </div>
 
@@ -132,6 +134,8 @@
             <button type="button" @click="toggleEditDialog">Cancel</button>
           </div>
         </form>
+        <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+        <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
       </div>
     </div>
     </div>
@@ -165,6 +169,8 @@ export default {
         tipo: "",
       },
       editData: null,
+      errorMessage: "",
+      successMessage: "",
     };
   },
   computed: {
@@ -183,9 +189,13 @@ export default {
   methods: {
     toggleAddDialog() {
       this.showAddDialog = !this.showAddDialog;
+      this.errorMessage = "";
+      this.successMessage = "";
     },
     toggleEditDialog() {
       this.showEditDialog = !this.showEditDialog;
+      this.errorMessage = "";
+      this.successMessage = "";
     },
     async deleteSupplier(supplierId) {
       const confirmation = confirm("¿Estás seguro de que deseas eliminar este proveedor?");
@@ -193,8 +203,7 @@ export default {
 
       try {
         await axios.delete(`proveedor/delete/${supplierId}`);
-        this.suppliers = this.suppliers.filter((supplier) => supplier.id !== supplierId); // Eliminar tienda de la lista local
-        alert("Proveedor eliminado con éxito.");
+        this.suppliers = this.suppliers.filter((supplier) => supplier.id !== supplierId);
       } catch (error) {
         console.error("Error al eliminar la tienda:", error.response?.data || error.message);
         alert("Hubo un error al intentar eliminar la tienda.");
@@ -218,9 +227,16 @@ export default {
         const response = await axios.put(`proveedor/update/${this.editData.id}`, this.editData);
         const index = this.suppliers.findIndex((t) => t.id === this.editData.id);
         if (index !== -1) this.suppliers[index] = response.data; // Actualizar lista
+        this.successMessage = "Proveedor editado exitosamente.";
+        this.errorMessage = "";
         this.toggleEditDialog(); // Cerrar el modal
       } catch (error) {
-        console.error("Error al actualizar la tienda:", error.response.data.error);
+        if (error.response && error.response.data) {
+            this.errorMessage = error.response.data.error;
+          } else {
+            this.errorMessage = "Ocurrió un error inesperado.";
+          }
+          this.successMessage = "";
       }
     },
     async submitNewsuppiler() {
@@ -237,8 +253,15 @@ export default {
           email: "",
           tipo: "",
         }; // Limpiar el formulario
+        this.successMessage = "Proveedor registrado exitosamente.";
+        this.errorMessage = "";
       } catch (error) {
-        console.error("Error al agregar la tienda:", error.response.data.error);
+        if (error.response && error.response.data) {
+            this.errorMessage = error.response.data.error;
+          } else {
+            this.errorMessage = "Ocurrió un error inesperado.";
+          }
+          this.successMessage = "";
       }
     },
     async downloadAllSuppliers() {
@@ -400,7 +423,16 @@ export default {
   background-color: #004ee0; /* Amarillo más oscuro al pasar el cursor */
   transform: scale(1.05); /* Efecto de crecimiento */
 }
-
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 10px;
+  }
+  .success-message {
+    color: green;
+    font-size: 14px;
+    margin-top: 10px;
+  }
 .edit-btn:active {
   transform: scale(0.95); /* Efecto de pulsación */
 }
