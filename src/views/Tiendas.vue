@@ -507,16 +507,52 @@ export default {
     max-width: 100%;
   }
 }
-.delete-btn {
-  background-color: #e74c3c;
-  color: white;
+.edit-section {
+  display: flex;
+  gap: 10px; /* Espaciado entre botones */
+  justify-content: flex-start; /* Alineación a la izquierda */
+  margin-top: 10px; /* Espaciado superior */
+}
+
+/* Estilo para el botón de editar */
+.edit-btn {
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  color: #fff; /* Texto blanco */
+  background-color: #0787ff; /* Amarillo */
   border: none;
-  padding: 5px 10px;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.edit-btn:hover {
+  background-color: #004ee0; /* Amarillo más oscuro al pasar el cursor */
+  transform: scale(1.05); /* Efecto de crecimiento */
+}
+
+.edit-btn:active {
+  transform: scale(0.95); /* Efecto de pulsación */
+}
+
+/* Estilo para el botón de borrar */
+.delete-btn {
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  color: #fff; /* Texto blanco */
+  background-color: #dc3545; /* Rojo */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
 }
 
 .delete-btn:hover {
-  background-color: #c0392b;
+  background-color: #c82333; /* Rojo más oscuro al pasar el cursor */
+  transform: scale(1.05); /* Efecto de crecimiento */
+}
+
+.delete-btn:active {
+  transform: scale(0.95); /* Efecto de pulsación */
 }
 </style>
