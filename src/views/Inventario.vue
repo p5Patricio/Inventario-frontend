@@ -11,7 +11,7 @@
         <div class="buscador">
           <input
             type="text"
-            placeholder="🔍 Search product, supplier, order"
+            placeholder="🔍 Search product"
             class="input-buscador"
             v-model="searchTerm"
             @input="filterProducts"
@@ -53,7 +53,7 @@
       <section class="orders">
         <div class="orders-card">
           <div class="orders-card2">
-            <h2>Inventory</h2>
+            <h2>Products</h2>
             <div class="actions">
               <button class="add-btn" @click="toggleAddProductDialog">Add Product</button>
               <button class="download-btn" @click="downloadAllProducts">Download All</button>
