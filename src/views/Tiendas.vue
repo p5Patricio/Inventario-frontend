@@ -11,7 +11,7 @@
         <div class="buscador">
           <input
             type="text"
-            placeholder="🔍 Buscar en tiendas"
+            placeholder="🔍 serch in stores"
             class="input-buscador"
             v-model="searchTerm"
           />
@@ -37,14 +37,14 @@
             </div>
 
             <div class="store-details">
-              <h3>Nombre: {{ tienda.nombre }}</h3>
+              <h3>Name: {{ tienda.nombre }}</h3>
               <div class="store-info">
-                <p class="store-name">Gerente: {{ tienda.gerente }}</p>
-                <p class="store-location"> Ciudad y municipio: 
+                <p class="store-name">Manager: {{ tienda.gerente }}</p>
+                <p class="store-location"> city and municipality: 
                   {{ tienda.estado }} - {{ tienda.municipio }}
                 </p>
-                <p class="store-address">Direccion: {{ tienda.direccion }}</p>
-                <p class="store-phone">Numero: {{ tienda.numero }}</p>
+                <p class="store-address">Address: {{ tienda.direccion }}</p>
+                <p class="store-phone">Number: {{ tienda.numero }}</p>
               </div>
             </div>
 
@@ -63,27 +63,27 @@
         <h2>Add New Store</h2>
         <form @submit.prevent="submitNewStore">
           <div>
-            <label for="nombre">Nombre:</label>
+            <label for="nombre">Name:</label>
             <input type="text" id="nombre" v-model="newStore.nombre" required />
           </div>
           <div>
-            <label for="numero">Número:</label>
+            <label for="numero">Number:</label>
             <input type="text" id="numero" v-model="newStore.numero" required />
           </div>
           <div>
-            <label for="estado">Estado:</label>
+            <label for="estado">City:</label>
             <input type="text" id="estado" v-model="newStore.estado" required />
           </div>
           <div>
-            <label for="municipio">Municipio:</label>
+            <label for="municipio">Municipality:</label>
             <input type="text" id="municipio" v-model="newStore.municipio" required />
           </div>
           <div>
-            <label for="direccion">Dirección:</label>
+            <label for="direccion">Address:</label>
             <input type="text" id="direccion" v-model="newStore.direccion" required />
           </div>
           <div>
-            <label for="gerente">Gerente:</label>
+            <label for="gerente">Manager:</label>
             <input type="text" id="gerente" v-model="newStore.gerente" required />
           </div>
           <div class="modal-actions">
@@ -91,6 +91,8 @@
             <button type="button" @click="toggleAddStoreDialog">Cancel</button>
           </div>
         </form>
+        <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+        <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
       </div>
     </div>
 
@@ -100,27 +102,27 @@
         <h2>Edit Store</h2>
         <form @submit.prevent="submitEditStore">
           <div>
-            <label for="edit-nombre">Nombre:</label>
+            <label for="edit-nombre">Name:</label>
             <input type="text" id="edit-nombre" v-model="editStoreData.nombre" required />
           </div>
           <div>
-            <label for="edit-numero">Número:</label>
+            <label for="edit-numero">Number:</label>
             <input type="text" id="edit-numero" v-model="editStoreData.numero" required />
           </div>
           <div>
-            <label for="edit-estado">Estado:</label>
+            <label for="edit-estado">City:</label>
             <input type="text" id="edit-estado" v-model="editStoreData.estado" required />
           </div>
           <div>
-            <label for="edit-municipio">Municipio:</label>
+            <label for="edit-municipio">Municipality:</label>
             <input type="text" id="edit-municipio" v-model="editStoreData.municipio" required />
           </div>
           <div>
-            <label for="edit-direccion">Dirección:</label>
+            <label for="edit-direccion">Address:</label>
             <input type="text" id="edit-direccion" v-model="editStoreData.direccion" required />
           </div>
           <div>
-            <label for="edit-gerente">Gerente:</label>
+            <label for="edit-gerente">Manager:</label>
             <input type="text" id="edit-gerente" v-model="editStoreData.gerente" required />
           </div>
           <div class="modal-actions">
@@ -128,6 +130,8 @@
             <button type="button" @click="toggleEditStoreDialog">Cancel</button>
           </div>
         </form>
+        <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+        <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
       </div>
     </div>
   </div>
@@ -158,6 +162,8 @@ export default {
         gerente: "",
       },
       editStoreData: null,
+      errorMessage: "",
+      successMessage: "",
     };
   },
   computed: {
@@ -184,9 +190,13 @@ export default {
     },
     toggleAddStoreDialog() {
       this.showAddStoreDialog = !this.showAddStoreDialog;
+      this.errorMessage = "";
+      this.successMessage = "";
     },
     toggleEditStoreDialog() {
       this.showEditStoreDialog = !this.showEditStoreDialog;
+      this.errorMessage = "";
+      this.successMessage = "";
     },
     editStore(tienda) {
       this.editStoreData = { ...tienda }; // Clonar datos de la tienda
@@ -197,9 +207,16 @@ export default {
         const response = await axios.put(`/tienda/update/${this.editStoreData.id}`, this.editStoreData);
         const index = this.tiendas.findIndex((t) => t.id === this.editStoreData.id);
         if (index !== -1) this.tiendas[index] = response.data; // Actualizar lista
+        this.successMessage = "Tienda editada exitosamente.";
+        this.errorMessage = "";
         this.toggleEditStoreDialog(); // Cerrar el modal
       } catch (error) {
-        console.error("Error al actualizar la tienda:", error.response.data.error);
+        if (error.response && error.response.data) {
+            this.errorMessage = error.response.data.error;
+          } else {
+            this.errorMessage = "Ocurrió un error inesperado.";
+          }
+          this.successMessage = "";
       }
     },
     async submitNewStore() {
@@ -216,8 +233,15 @@ export default {
           direccion: "",
           gerente: "",
         }; // Limpiar el formulario
+        this.successMessage = "Tienda registrada exitosamente.";
+        this.errorMessage = "";
       } catch (error) {
-        console.error("Error al agregar la tienda:", error.response.data.error);
+        if (error.response && error.response.data) {
+            this.errorMessage = error.response.data.error;
+          } else {
+            this.errorMessage = "Ocurrió un error inesperado.";
+          }
+          this.successMessage = "";
       }
     },
     async deleteStore(storeId) {
@@ -227,7 +251,6 @@ export default {
       try {
         await axios.delete(`/tienda/delete/${storeId}`);
         this.tiendas = this.tiendas.filter((tienda) => tienda.id !== storeId); // Eliminar tienda de la lista local
-        alert("Tienda eliminada con éxito.");
       } catch (error) {
         console.error("Error al eliminar la tienda:", error.response?.data || error.message);
         alert("Hubo un error al intentar eliminar la tienda.");
@@ -332,7 +355,16 @@ export default {
   overflow-y: auto;
   padding-bottom: 24px;
 }
-
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 10px;
+  }
+  .success-message {
+    color: green;
+    font-size: 14px;
+    margin-top: 10px;
+  }
 /* Estilizar la barra de scroll */
 .stores-container::-webkit-scrollbar {
   width: 8px;

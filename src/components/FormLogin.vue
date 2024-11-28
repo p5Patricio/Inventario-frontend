@@ -39,6 +39,7 @@
             Don’t have an account? <router-link to="/signup" class="signup-link">Sign up</router-link>
           </p>
         </form>
+        <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
       </div>
     </div>
   </div>
@@ -214,5 +215,10 @@
   }
   .signup-link:hover {
     text-decoration: underline;
+  }
+  .error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 10px;
   }
   </style>

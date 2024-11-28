@@ -768,5 +768,109 @@ export default {
 .discard-btn:hover {
   background-color: #bbb;
 }
+
+.modal-title {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Imagen en el formulario */
+.image-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.image-placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 150px;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.image-placeholder img {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 8px;
+}
+
+.browse-link {
+  color: #007bff;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.form-group {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 15px;
+}
+
+.form-group label {
+  flex: 0 0 150px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  text-align: left;
+}
+
+.form-group input,
+.form-group select {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  width: 100%;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.modal-actions button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.add-btn-modal {
+  background-color: #0052cc;
+  color: white;
+}
+
+.add-btn-modal:hover {
+  background-color: #003d99;
+}
+
+.discard-btn {
+  background-color: #ddd;
+  color: black;
+}
+
+.discard-btn:hover {
+  background-color: #bbb;
+}
 </style>
 
