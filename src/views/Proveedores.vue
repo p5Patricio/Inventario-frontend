@@ -9,7 +9,7 @@
         <div class="buscador">
           <input
             type="text"
-            placeholder="🔍 Buscar en proveedores"
+            placeholder="🔍 Serch suppliers"
             class="input-buscador"
             v-model="searchTerm"
           />
@@ -24,6 +24,7 @@
 
       <!-- Tabla de Proveedores -->
       <section class="suppliers-table">
+        <h1 >Suppliers</h1>
         <table>
           <thead>
             <tr>
@@ -45,10 +46,10 @@
               <td :class="supplier.tipo === 'Taking Return' ? 'taking-return' : 'not-taking-return'">
                 {{ supplier.tipo }}
               </td>
-              <div class="edit-section">
+              <td class="edit-section">
               <button class="edit-btn" @click="editSupplier(supplier)">Edit</button>
               <button class="delete-btn" @click="deleteSupplier(supplier.id)">Delete</button>
-            </div>
+              </td>
             </tr>
           </tbody>
         </table>

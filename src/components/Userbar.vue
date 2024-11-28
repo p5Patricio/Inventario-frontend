@@ -92,7 +92,11 @@ export default {
         this.showDialog = true;
       } catch (error) {
         console.error("Error al obtener datos del usuario:", error);
-        alert("No se pudieron cargar los datos del usuario");
+        alert("Token expirado, vulve a iniciar sesion");
+        // Limpiar el localStorage
+        localStorage.clear();
+        // Redireccionar a la ruta base
+        this.$router.push("/");
       }
     },
     closeUserDialog() {
