@@ -12,7 +12,7 @@
     <!-- Diálogo de usuario -->
     <div v-if="showDialog" class="dialog-overlay">
       <div class="dialog">
-        <h3>Información del Usuario</h3>
+        <h3>User data</h3>
         <form @submit.prevent="updateUser">
           <!-- Mostrar imagen actual si existe -->
           <div v-if="editableUser.usuario.profileImage">
@@ -21,34 +21,34 @@
             <img :src="getFullImageUrl(editableUser.usuario.profileImage)" alt="Imagen de perfil" class="profile-image-preview" />
           </div>
           <div>
-            <label for="profileImage">Cambiar Foto de perfil:</label>
+            <label for="profileImage">Change profile picture:</label>
             <input type="file" id="profileImage" @change="onFileChange" />
           </div>
           <div>
-            <label for="nombre">Nombre:</label>
+            <label for="nombre">Name:</label>
             <input type="text" id="nombre" v-model="editableUser.usuario.nombre" />
           </div>
           <div>
-            <label for="apellido_pat">Apellido Paterno:</label>
+            <label for="apellido_pat">Paternal last name:</label>
             <input type="text" id="apellido_pat" v-model="editableUser.usuario.apellido_pat" />
           </div>
           <div>
-            <label for="apellido_mat">Apellido Materno:</label>
+            <label for="apellido_mat">Maternal last name:</label>
             <input type="text" id="apellido_mat" v-model="editableUser.usuario.apellido_mat" />
           </div>
           <div>
-            <label for="usuario">Usuario:</label>
+            <label for="usuario">User:</label>
             <input type="text" id="usuario" v-model="editableUser.usuario.usuario" />
           </div>
           <div>
-            <label for="email">Correo Electrónico:</label>
+            <label for="email">Email:</label>
             <input type="email" id="email" v-model="editableUser.usuario.email" />
           </div>
           <div class="button-group">
-            <button type="submit">Guardar Cambios</button>
-            <button type="button" @click="closeUserDialog">Cerrar</button>
+            <button type="submit">Save changes</button>
+            <button type="button" @click="closeUserDialog">Close</button>
             <button type="button" @click="deleteUser" class="delete-btn">
-              Eliminar Usuario
+              Delete user
             </button>
           </div>
         </form>
@@ -192,6 +192,7 @@ export default {
 
 .dialog form > div {
   margin-bottom: 20px;
+  width: 430px;
 }
 
 .dialog label {
