@@ -3,48 +3,92 @@
     <Userbar />
     <BarraLateral />
     <div class="contenido-principal">
-      <h1 class="dashboard-title">Dashboard</h1>
+      <!-- Título del Dashboard -->
+      <div class="header">
+        <h1 class="dashboard-title">Dashboard</h1>
+        <div class="search-bar">
+          <input type="text" placeholder="Search product, supplier, order" />
+        </div>
+      </div>
 
+      <!-- Contenedor de las tarjetas y gráficos -->
       <div class="dashboard-grid">
         <!-- Sales Overview -->
-        <div class="dashboard-card">
+        <div class="dashboard-card overview-card">
           <h2>Sales Overview</h2>
-          <p>Total Tiendas: {{ totalTiendas }}</p>
-          <p>Número de Productos: {{ totalProductos }}</p>
-          <p>Total Precio de Compra: ₹{{ totalPrecioCompra }}</p>
-        </div>
-
-        <!-- Inventory Summary -->
-        <div class="dashboard-card">
-          <h2>Inventory Summary</h2>
-          <p>Total Cantidad: {{ totalCantidad }}</p>
-          <p>Órdenes Pendientes: {{ totalOrdenesPendientes }}</p>
+          <div class="overview-content">
+            <p>₹ 832 <span>Sales</span></p>
+            <p>₹ 18,300 <span>Revenue</span></p>
+            <p>₹ 868 <span>Profit</span></p>
+            <p>₹ 17,432 <span>Cost</span></p>
+          </div>
         </div>
 
         <!-- Purchase Overview -->
-        <div class="dashboard-card">
+        <div class="dashboard-card overview-card">
           <h2>Purchase Overview</h2>
-          <p>Total Órdenes: {{ totalOrdenes }}</p>
-          <p>Total Precio de Compra de Órdenes: ₹{{ totalPrecioOrdenes }}</p>
-          <p>Total Cantidad de Órdenes: {{ totalCantidadOrdenes }}</p>
-          <p>Categorías de Órdenes: {{ categoriasOrdenes }}</p>
+          <div class="overview-content">
+            <p>82 <span>Purchase</span></p>
+            <p>₹ 13,573 <span>Cost</span></p>
+            <p>5 <span>Cancel</span></p>
+            <p>₹ 17,432 <span>Return</span></p>
+          </div>
+        </div>
+
+        <!-- Inventory Summary -->
+        <div class="dashboard-card overview-card">
+          <h2>Inventory Summary</h2>
+          <div class="overview-content">
+            <p>868 <span>Quantity in Hand</span></p>
+            <p>200 <span>To be received</span></p>
+          </div>
         </div>
 
         <!-- Product Summary -->
-        <div class="dashboard-card">
+        <div class="dashboard-card overview-card">
           <h2>Product Summary</h2>
-          <p>Total Proveedores: {{ totalProveedores }}</p>
-          <p>Categorías de Proveedores: {{ categoriasProveedores }}</p>
+          <div class="overview-content">
+            <p>31 <span>Number of Suppliers</span></p>
+            <p>21 <span>Number of Categories</span></p>
+          </div>
+        </div>
+
+        <!-- Sales & Purchase Graph -->
+        <div class="dashboard-card graph-box">
+          <div class="graph-header">
+            <h2>Sales & Purchase</h2>
+            <button class="toggle-view">Weekly</button>
+          </div>
+          <BarChart v-if="salesPurchaseData.labels.length" :chart-data="salesPurchaseData" />
+        </div>
+
+        <!-- Order Summary Graph -->
+        <div class="dashboard-card graph-box">
+          <h2>Order Summary</h2>
+          <LineChart v-if="orderSummaryData.labels.length" :chart-data="orderSummaryData" />
         </div>
 
         <!-- Top Selling Stock -->
         <div class="dashboard-card">
           <h2>Top Selling Stock</h2>
-          <ul>
-            <li v-for="producto in topProductos" :key="producto.id">
-              {{ producto.nombre }} - Cantidad: {{ producto.cantidad }} - Precio: ₹{{ producto.precioCompra }}
-            </li>
-          </ul>
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Sold Quantity</th>
+                <th>Remaining Quantity</th>
+                <th>Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="producto in topProductos" :key="producto.id">
+                <td>{{ producto.nombre }}</td>
+                <td>{{ producto.cantidadVendida }}</td>
+                <td>{{ producto.cantidadRestante }}</td>
+                <td>₹{{ producto.precio }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <!-- Low Quantity Stock -->
@@ -53,23 +97,10 @@
           <ul>
             <li v-for="producto in lowStockProductos" :key="producto.id">
               <img :src="getFullImageUrl(producto.imagenProducto)" alt="Imagen de producto" />
-              {{ producto.nombre }} - Cantidad: {{ producto.cantidad }}
+              <span>{{ producto.nombre }}</span>
+              <span>Remaining Quantity: {{ producto.cantidad }}</span>
             </li>
           </ul>
-        </div>
-
-        <!-- Sales & Purchase Graph -->
-        <div class="dashboard-card graph-box">
-          <h2>Sales & Purchase</h2>
-          <BarChart v-if="salesPurchaseData.labels.length" :chart-data="salesPurchaseData" />
-          <p v-else>Cargando datos de la gráfica de ventas y compras...</p>
-        </div>
-
-        <!-- Order Summary Graph -->
-        <div class="dashboard-card graph-box">
-          <h2>Order Summary</h2>
-          <LineChart v-if="orderSummaryData.labels.length" :chart-data="orderSummaryData" />
-          <p v-else>Cargando datos de la gráfica de resumen de órdenes...</p>
         </div>
       </div>
     </div>
@@ -249,47 +280,99 @@ export default {
 
 .contenido-principal {
   flex: 1;
-  padding: 30px;
+  padding: 20px;
   background-color: #f9f9f9;
-  overflow-y: auto;
 }
 
 .dashboard-title {
   font-size: 28px;
   margin-bottom: 20px;
   text-align: center;
-  color: #333;
   font-weight: 600;
 }
 
-/* Estilo de la cuadrícula */
+.search-bar {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.search-bar input {
+  width: 60%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 20px;
-  align-items: start;
 }
 
-/* Estilo de las tarjetas */
 .dashboard-card {
-  background: #fff;
-  border-radius: 8px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
   padding: 20px;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-  border: 1px solid #ddd;
 }
 
-.dashboard-card h2 {
+.overview-card h2 {
   font-size: 18px;
-  margin-bottom: 10px;
-  font-weight: bold;
-  color: #333;
+  margin-bottom: 15px;
+  font-weight: 600;
 }
 
-.dashboard-card p {
-  margin: 5px 0;
+.overview-content p {
   font-size: 14px;
-  color: #555;
+  margin: 5px 0;
+}
+
+.overview-content span {
+  color: #888;
+  font-size: 12px;
+  margin-left: 10px;
+}
+
+.graph-box {
+  padding: 15px;
+}
+
+.graph-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.graph-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.toggle-view {
+  background: transparent;
+  border: none;
+  color: #007bff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table th,
+table td {
+  text-align: left;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+table th {
+  background-color: #f8f8f8;
+  font-weight: 600;
 }
 
 ul {
@@ -298,60 +381,20 @@ ul {
 }
 
 ul li {
-  font-size: 14px;
-  color: #333;
-  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
 }
 
 ul li img {
   width: 40px;
   height: 40px;
   margin-right: 10px;
-  vertical-align: middle;
-  border-radius: 4px;
-  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
 }
 
-/* Gráficas */
-.graph-box {
-  padding: 20px;
-}
-
-.graph-box h2 {
-  font-size: 16px;
-  margin-bottom: 15px;
+ul li span {
+  font-size: 14px;
   color: #333;
-}
-
-.graph-box canvas {
-  margin-top: 10px;
-}
-
-/* Estilo responsivo */
-@media (max-width: 768px) {
-  .contenido-principal {
-    padding: 15px;
-  }
-
-  .dashboard-title {
-    font-size: 22px;
-  }
-
-  .dashboard-card {
-    padding: 15px;
-  }
-
-  .dashboard-card h2 {
-    font-size: 16px;
-  }
-
-  .dashboard-card p {
-    font-size: 13px;
-  }
-
-  ul li img {
-    width: 30px;
-    height: 30px;
-  }
 }
 </style>
