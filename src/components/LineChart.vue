@@ -59,7 +59,7 @@
   };
   </script>
   
-  <style>
+  <style scoped>
   canvas {
     max-width: 100%;
   }
