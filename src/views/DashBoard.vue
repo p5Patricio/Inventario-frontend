@@ -3,97 +3,131 @@
     <Userbar />
     <BarraLateral />
     <div class="contenido-principal">
-      <h1>Pagina para el dashboard</h1>
+      <!-- Título del Dashboard -->
+      <div class="header">
+        <h1 class="dashboard-title">Dashboard</h1>
+        <div class="search-bar">
+          <input type="text" placeholder="Search product, supplier, order" />
+        </div>
+      </div>
 
-      <!-- Sección de carga -->
-      <div v-if="loading">Cargando datos...</div>
-      
-      <!-- Secciones del dashboard -->
-      <div v-else>
-        <div class="overview-section">
+      <!-- Contenedor de las tarjetas y gráficos -->
+      <div class="dashboard-grid">
+        <!-- Sales Overview -->
+        <div class="dashboard-card overview-card">
           <h2>Sales Overview</h2>
-          <div class="overview-box">
-            <p>Total Tiendas: {{ totalTiendas }}</p>
-            <p>Número de Productos: {{ totalProductos }}</p>
-            <p>Total Precio de Compra: ₹{{ totalPrecioCompra }}</p>
+          <div class="overview-content">
+            <p>₹ 832 <span>Sales</span></p>
+            <p>₹ 18,300 <span>Revenue</span></p>
+            <p>₹ 868 <span>Profit</span></p>
+            <p>₹ 17,432 <span>Cost</span></p>
           </div>
         </div>
 
-        <div class="overview-section">
-          <h2>Inventory Summary</h2>
-          <div class="overview-box">
-            <p>Total Cantidad: {{ totalCantidad }}</p>
-            <p>Órdenes Pendientes: {{ totalOrdenesPendientes }}</p>
-          </div>
-        </div>
-
-        <div class="overview-section">
+        <!-- Purchase Overview -->
+        <div class="dashboard-card overview-card">
           <h2>Purchase Overview</h2>
-          <div class="overview-box">
-            <p>Total Órdenes: {{ totalOrdenes }}</p>
-            <p>Total Precio de Compra de Órdenes: ₹{{ totalPrecioOrdenes }}</p>
-            <p>Total Cantidad de Órdenes: {{ totalCantidadOrdenes }}</p>
-            <p>Categorías de Órdenes: {{ categoriasOrdenes }}</p>
+          <div class="overview-content">
+            <p>82 <span>Purchase</span></p>
+            <p>₹ 13,573 <span>Cost</span></p>
+            <p>5 <span>Cancel</span></p>
+            <p>₹ 17,432 <span>Return</span></p>
           </div>
         </div>
 
-        <div class="overview-section">
+        <!-- Inventory Summary -->
+        <div class="dashboard-card overview-card">
+          <h2>Inventory Summary</h2>
+          <div class="overview-content">
+            <p>868 <span>Quantity in Hand</span></p>
+            <p>200 <span>To be received</span></p>
+          </div>
+        </div>
+
+        <!-- Product Summary -->
+        <div class="dashboard-card overview-card">
           <h2>Product Summary</h2>
-          <div class="overview-box">
-            <p>Total Proveedores: {{ totalProveedores }}</p>
-            <p>Categorías de Proveedores: {{ categoriasProveedores }}</p>
+          <div class="overview-content">
+            <p>31 <span>Number of Suppliers</span></p>
+            <p>21 <span>Number of Categories</span></p>
           </div>
         </div>
 
-        <div class="overview-section">
-          <h2>Top Selling Stock</h2>
-          <ul>
-            <li v-for="producto in topProductos" :key="producto.id">
-              {{ producto.nombre }} - Cantidad: {{ producto.cantidad }} - Precio: ₹{{ producto.precioCompra }}
-            </li>
-          </ul>
+        <!-- Sales & Purchase Graph -->
+        <div class="dashboard-card graph-box">
+          <div class="graph-header">
+            <h2>Sales & Purchase</h2>
+            <button class="toggle-view">Weekly</button>
+          </div>
+          <BarChart v-if="salesPurchaseData.labels.length" :chart-data="salesPurchaseData" />
         </div>
 
-        <div class="overview-section">
+        <!-- Order Summary Graph -->
+        <div class="dashboard-card graph-box">
+          <h2>Order Summary</h2>
+          <LineChart v-if="orderSummaryData.labels.length" :chart-data="orderSummaryData" />
+        </div>
+
+        <!-- Top Selling Stock -->
+        <div class="dashboard-card">
+          <h2>Top Selling Stock</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Sold Quantity</th>
+                <th>Remaining Quantity</th>
+                <th>Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="producto in topProductos" :key="producto.id">
+                <td>{{ producto.nombre }}</td>
+                <td>{{ producto.cantidadVendida }}</td>
+                <td>{{ producto.cantidadRestante }}</td>
+                <td>₹{{ producto.precio }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Low Quantity Stock -->
+        <div class="dashboard-card">
           <h2>Low Quantity Stock</h2>
           <ul>
             <li v-for="producto in lowStockProductos" :key="producto.id">
               <img :src="getFullImageUrl(producto.imagenProducto)" alt="Imagen de producto" />
-              {{ producto.nombre }} - Cantidad: {{ producto.cantidad }}
+              <span>{{ producto.nombre }}</span>
+              <span>Remaining Quantity: {{ producto.cantidad }}</span>
             </li>
           </ul>
         </div>
       </div>
-
-      <!-- Gráfica -->
-      <div v-if="!chartData.labels.length || !chartData.datasets.length">
-        <p>Cargando datos de la gráfica...</p>
-      </div>
-      <BarChart
-        v-else
-        :chart-data="JSON.parse(JSON.stringify(chartData))"
-      />
     </div>
   </div>
 </template>
-
-
 
 <script>
 import axios from "axios";
 import Userbar from "@/components/Userbar.vue";
 import BarraLateral from "@/components/BarraLateral.vue";
 import BarChart from "@/components/BarChart.vue";
+import LineChart from "@/components/LineChart.vue"; // Usaremos LineChart para "Order Summary"
 
 export default {
   components: {
     Userbar,
     BarraLateral,
     BarChart,
+    LineChart,
   },
   data() {
     return {
-      chartData: {
+      salesPurchaseData: {
+        labels: [],
+        datasets: [],
+      },
+      orderSummaryData: {
         labels: [],
         datasets: [],
       },
@@ -111,13 +145,12 @@ export default {
       categoriasProveedores: 0,
       topProductos: [],
       lowStockProductos: [],
-      backendUrl: 'http://localhost:3000',
+      backendUrl: "http://localhost:3000",
     };
   },
   methods: {
     async fetchData() {
       try {
-        // Realizamos las peticiones al backend
         const [productosRes, proveedoresRes, tiendasRes, ordenesRes] = await Promise.all([
           axios.get("productos/"),
           axios.get("proveedor/list"),
@@ -125,7 +158,6 @@ export default {
           axios.get("ordenes/list"),
         ]);
 
-        // Datos obtenidos de las respuestas
         const productos = productosRes.data;
         const proveedores = proveedoresRes.data;
         const tiendas = tiendasRes.data;
@@ -151,24 +183,21 @@ export default {
         this.categoriasProveedores = new Set(proveedores.map((prov) => prov.categoria)).size;
 
         // Top Selling Stock
-        this.topProductos = productos
-          .sort((a, b) => b.valorUmbral - a.valorUmbral)
-          .slice(0, 3);
+        this.topProductos = productos.sort((a, b) => b.valorUmbral - a.valorUmbral).slice(0, 3);
 
         // Low Quantity Stock
-        this.lowStockProductos = productos
-          .sort((a, b) => a.valorUmbral - b.valorUmbral)
-          .slice(0, 3);
+        this.lowStockProductos = productos.sort((a, b) => a.valorUmbral - b.valorUmbral).slice(0, 3);
 
-        // Datos para la gráfica
-        this.fetchChartData(productos, ordenes);
+        // Fetch data for graphs
+        this.fetchSalesPurchaseData(productos, ordenes);
+        await this.fetchOrderSummary();
 
         this.loading = false;
       } catch (error) {
         console.error("Error al cargar los datos:", error);
       }
     },
-    fetchChartData(productos, ordenes) {
+    fetchSalesPurchaseData(productos, ordenes) {
       const fechas = [...new Set([...productos.map((p) => p.fechadeventa), ...ordenes.map((o) => o.fechaEntrega)])];
 
       const productosPrecios = fechas.map((fecha) => {
@@ -181,7 +210,7 @@ export default {
         return orden ? orden.precioCompra : 0;
       });
 
-      this.chartData = {
+      this.salesPurchaseData = {
         labels: [...fechas],
         datasets: [
           {
@@ -201,8 +230,39 @@ export default {
         ],
       };
     },
+    async fetchOrderSummary() {
+      try {
+        const response = await axios.get(`${this.backendUrl}/api/ordenes/summary`);
+        const resumen = response.data;
+
+        this.orderSummaryData = {
+          labels: resumen.map((r) => r.fecha),
+          datasets: [
+            {
+              label: "Ordered",
+              data: resumen.map((r) => r.ordered),
+              backgroundColor: "rgba(255, 159, 64, 0.2)",
+              borderColor: "rgba(255, 159, 64, 1)",
+              borderWidth: 2,
+              tension: 0.4, // Líneas suaves
+              fill: true, // Relleno debajo de la línea
+            },
+            {
+              label: "Delivered",
+              data: resumen.map((r) => r.delivered),
+              backgroundColor: "rgba(54, 162, 235, 0.2)",
+              borderColor: "rgba(54, 162, 235, 1)",
+              borderWidth: 2,
+              tension: 0.4, // Líneas suaves
+              fill: true, // Relleno debajo de la línea
+            },
+          ],
+        };
+      } catch (error) {
+        console.error("Error al cargar el resumen de órdenes:", error);
+      }
+    },
     getFullImageUrl(imagePath) {
-      // Concatenar la URL base del backend con la ruta de la imagen
       return `${this.backendUrl}${imagePath}`;
     },
   },
@@ -213,28 +273,128 @@ export default {
 </script>
 
 <style scoped>
-.overview-section {
+.layout {
+  display: flex;
+  height: 100vh;
+}
+
+.contenido-principal {
+  flex: 1;
+  padding: 20px;
+  background-color: #f9f9f9;
+}
+
+.dashboard-title {
+  font-size: 28px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.search-bar {
+  display: flex;
+  justify-content: center;
   margin-bottom: 20px;
 }
-.overview-box {
-  border: 1px solid #ddd;
+
+.search-bar input {
+  width: 60%;
   padding: 10px;
-  border-radius: 5px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
 }
-.overview-box p {
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.dashboard-card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+.overview-card h2 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.overview-content p {
+  font-size: 14px;
   margin: 5px 0;
 }
+
+.overview-content span {
+  color: #888;
+  font-size: 12px;
+  margin-left: 10px;
+}
+
+.graph-box {
+  padding: 15px;
+}
+
+.graph-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.graph-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.toggle-view {
+  background: transparent;
+  border: none;
+  color: #007bff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table th,
+table td {
+  text-align: left;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+table th {
+  background-color: #f8f8f8;
+  font-weight: 600;
+}
+
 ul {
   list-style: none;
   padding: 0;
 }
+
 ul li {
+  display: flex;
+  align-items: center;
   margin-bottom: 10px;
 }
+
 ul li img {
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   margin-right: 10px;
-  vertical-align: middle;
+  border-radius: 5px;
+}
+
+ul li span {
+  font-size: 14px;
+  color: #333;
 }
 </style>
