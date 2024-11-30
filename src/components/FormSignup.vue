@@ -146,6 +146,7 @@
   <style scoped>
   /* Contenedor principal */
   .signup-container {
+font-family: 'Roboto', sans-serif; 
     display: flex;
     justify-content: center;
     align-items: center;

@@ -120,16 +120,16 @@ export default {
       }
     },
     calculateOverview() {
-      this.totalProductPurchaseValue = this.products.reduce(
-        (sum, product) => sum + product.precioCompra,
-        0
-      );
-      this.totalOrdersValue = this.orders.reduce(
-        (sum, order) => sum + order.valorOrden,
-        0
-      );
-      this.profit = this.totalProductPurchaseValue - this.totalOrdersValue;
-    },
+  this.totalProductPurchaseValue = this.products.reduce(
+    (sum, product) => sum + Number(product.precioCompra || 0),
+    0
+  );
+  this.totalOrdersValue = this.orders.reduce(
+    (sum, order) => sum + Number(order.valorOrden || 0),
+    0
+  );
+  this.profit = this.totalOrdersValue - this.totalProductPurchaseValue;
+},
     getBestSellingCategories() {
       this.bestSellingCategories = [...this.products]
         .sort((a, b) => a.valorUmbral - b.valorUmbral)
@@ -210,6 +210,7 @@ body {
   flex-direction: column;
   min-height: 100vh;
   overflow-y: auto;
+font-family: 'Roboto', sans-serif; 
 }
 
 .dashboard {

@@ -233,7 +233,6 @@ export default {
       if (confirm("¿Estás seguro de que deseas eliminar este producto?")) {
         try {
           await axios.delete(`${this.backendUrl}/api/productos/${this.product.id}`);
-          alert("Producto eliminado correctamente");
           this.$emit("delete", this.product.id);
         } catch (error) {
           console.error(
@@ -250,6 +249,7 @@ export default {
 
 <style scoped>
 .product-details-overlay {
+font-family: 'Roboto', sans-serif; 
   position: fixed;
   top: 0;
   left: 0;

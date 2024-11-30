@@ -284,6 +284,7 @@ display: flex;
 width: 79vw; 
 height: 100vh; 
 overflow: hidden; 
+font-family: 'Roboto', sans-serif; 
 }
 .main-content {
 flex: 1; 

@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <div>
+  <div class="contenedor">
     <!-- Barra de usuario -->
     <div class="user-bar">
       <span class="icon">👤</span>
@@ -157,6 +157,11 @@ export default {
 </script>
   
   <style scoped>
+
+  .contenedor {
+font-family: 'Roboto', sans-serif; 
+  }
+
   .dialog-overlay {
   position: fixed;
   top: 0;
