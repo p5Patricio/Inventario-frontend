@@ -338,6 +338,8 @@ export default {
         formData.append("valorUmbral", this.newProduct.valorUmbral);
         formData.append("imagenProducto", this.newProduct.imagen);
 
+        console.log(formData)
+
         const response = await axios.post(
           "http://localhost:3000/api/productos",
           formData,

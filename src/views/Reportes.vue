@@ -10,17 +10,27 @@
       <!-- Contenedor para Overview y Best Selling Category -->
       <div class="overview-category-container">
         <section class="overview">
-          <h2>Overview</h2>
+          <h2>📊 Overview</h2>
           <div class="stats">
-            <div>Total Products Purchase Value: ₹{{ totalProductPurchaseValue }}</div>
-            <div>Total Orders Value: ₹{{ totalOrdersValue }}</div>
-            <div>Profit: ₹{{ profit }}</div>
+            <div class="stat-item">
+              <span class="emoji">💰</span> 
+              Total Products Purchase Value: ₹{{ totalProductPurchaseValue }}
+            </div>
+            <div class="stat-item">
+              <span class="emoji">🛍️</span> 
+              Total Orders Value: ₹{{ totalOrdersValue }}
+            </div>
+            <div class="stat-item">
+              <span class="emoji">📈</span> 
+              Profit: ₹{{ profit }}
+            </div>
           </div>
         </section>
         <section class="best-selling-category">
-          <h2>Best Selling Category</h2>
+          <h2>🏆 Best Selling Category</h2>
           <ul>
             <li v-for="product in bestSellingCategories" :key="product.id">
+              <span class="category-icon">🔥</span>
               {{ product.categoria }} - Threshold Value: {{ product.valorUmbral }}
             </li>
           </ul>
@@ -31,18 +41,18 @@
         <line-chart :chart-data="chartData" />
       </section>
       <section class="best-selling-product">
-        <h2>Best Selling Products</h2>
+        <h2>⭐ Best Selling Products</h2>
         <ul>
           <li v-for="product in bestSellingProducts" :key="product.id">
-            {{ product.nombre }} - Remaining Quantity: {{ product.cantidad }}
+            <span class="product-icon">🎉</span>
+            Product name: {{ product.nombre }} - Remaining Quantity: {{ product.cantidad }} - 
+            Category: {{ product.categoria }} - Purchase price: {{ product.precioCompra }}
           </li>
         </ul>
       </section>
     </div>
   </div>
 </template>
-
-
 
 <script>
 import Userbar from "@/components/Userbar.vue";
@@ -189,42 +199,47 @@ body {
   font-family: "Poppins", sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f9f9f9;
+  background-color: #f0f4f8;
   color: #333;
   height: 100%;
-  overflow: auto; /* Permitir scroll en el cuerpo */
+  overflow: auto;
 }
 
 .layout {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  overflow-y: auto; /* Activar scroll solo en el contenedor */
+  overflow-y: auto;
 }
 
 .dashboard {
-  width: 3000px;
-  max-width: 1200px;
-  margin-top: 50px;
+  width: 1200px;
+  margin: 50px auto;
   padding: 20px;
-  box-sizing: border-box; /* Asegurar que padding no afecte el tamaño */
-  overflow: auto; /* Asegurar scroll dentro del dashboard */
+  box-sizing: border-box;
+  overflow: auto;
   display: flex;
   flex-direction: column;
+  gap: 20px;
 }
 
 section {
-  margin-bottom: 20px;
   background: white;
-  padding: 15px;
-  box-sizing: border-box;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+section:hover {
+  transform: translateY(-5px);
 }
 
 .loader {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh; /* Centrado vertical completo */
+  height: 100vh;
 }
 
 .overview-category-container {
@@ -236,40 +251,48 @@ section {
 .overview,
 .best-selling-category {
   flex: 1;
-  box-sizing: border-box;
-  max-width: 50%;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  padding: 20px;
 }
 
-.overview h2,
-.best-selling-category h2 {
+h2 {
   font-weight: 600;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   text-align: left;
   font-size: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .stats {
   display: flex;
   flex-direction: column;
+  gap: 15px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
   gap: 10px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+.emoji {
+  font-size: 24px;
 }
 
 .best-selling-category ul {
   list-style-type: none;
   padding: 0;
   margin: 0;
-  align-items: center;
 }
 
 .best-selling-category li {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 10px 0;
+  gap: 10px;
+  padding: 12px 0;
   border-bottom: 1px solid #f0f0f0;
 }
 
@@ -277,13 +300,38 @@ section {
   border-bottom: none;
 }
 
-.profit-revenue h2 {
-  text-align: left;
-  font-size: 24px;
+.category-icon {
+  font-size: 20px;
 }
 
-.best-selling-product h2 {
-  text-align: left;
-  font-size: 24px;
+.profit-revenue {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.best-selling-product ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centra los elementos horizontalmente */
+}
+
+.best-selling-product li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+  width: 80%; /* Opcional: para que no ocupe todo el ancho */
+  text-align: center;
+}
+
+.best-selling-product li:last-child {
+  border-bottom: none;
+}
+
+.product-icon {
+  font-size: 20px;
 }
 </style>
