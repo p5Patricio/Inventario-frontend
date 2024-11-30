@@ -306,6 +306,7 @@ export default {
 
 <style scoped>
 .layout {
+font-family: 'Roboto', sans-serif; 
   display: flex;
   flex-direction: column;
   margin-top: 60px;
@@ -313,6 +314,7 @@ export default {
 }
 
 .dashboard {
+font-family: 'Roboto', sans-serif; 
   width: 1145px;
   max-width: 100%;
   margin: 0 auto;

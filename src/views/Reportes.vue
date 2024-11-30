@@ -46,7 +46,7 @@
           <li v-for="product in bestSellingProducts" :key="product.id">
             <span class="product-icon">🎉</span>
             Product name: {{ product.nombre }} - Remaining Quantity: {{ product.cantidad }} - 
-            Category: {{ product.categoria }} - Purchase price: {{ product.precioCompra }}
+            Category: {{ product.categoria }} - Purchase price: ₹{{ product.precioCompra }}
           </li>
         </ul>
       </section>

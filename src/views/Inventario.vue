@@ -444,6 +444,7 @@ export default {
 <style scoped>
 /* Layout principal */
 .layout {
+font-family: 'Roboto', sans-serif; 
   display: flex;
   min-height: 100vh; /* Ancho mayor que el predeterminado */
   margin: 0 auto; /* Centra el contenido */
