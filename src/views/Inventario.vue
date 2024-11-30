@@ -11,7 +11,7 @@
         <div class="buscador">
           <input
             type="text"
-            placeholder="🔍 Search product"
+            placeholder="🔍 Search product, supplier, order"
             class="input-buscador"
             v-model="searchTerm"
             @input="filterProducts"
@@ -53,7 +53,7 @@
       <section class="orders">
         <div class="orders-card">
           <div class="orders-card2">
-            <h2>Products</h2>
+            <h2>Inventory</h2>
             <div class="actions">
               <button class="add-btn" @click="toggleAddProductDialog">Add Product</button>
               <button class="download-btn" @click="downloadAllProducts">Download All</button>
@@ -61,7 +61,7 @@
           </div>
           <table>
             <thead>
-              <tr class="titulos">
+              <tr>
                 <th>Product</th>
                 <th>Buying Price</th>
                 <th>Quantity</th>
@@ -76,7 +76,6 @@
                 :key="item.id"
                 @click="selectProduct(item)"
                 style="cursor: pointer;"
-                class="contenido"
               >
                 <td>{{ item.nombre }}</td>
                 <td>₹{{ item.precioCompra }}</td>
@@ -337,8 +336,6 @@ export default {
         formData.append("fechadeventa", this.newProduct.fechadeventa || "");
         formData.append("valorUmbral", this.newProduct.valorUmbral);
         formData.append("imagenProducto", this.newProduct.imagen);
-
-        console.log(formData)
 
         const response = await axios.post(
           "http://localhost:3000/api/productos",
