@@ -228,8 +228,12 @@ export default {
           },
         });
 
+        // Solo agrega a orders
         this.orders.push(response.data);
-        this.filteredOrders.push(response.data); 
+        
+        // Vuelve a aplicar el filtro
+        this.filterOrders();
+        
         this.resetForm();
         this.closeModal();
       } catch (error) {
@@ -274,12 +278,13 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .layout {
 display: flex;
 width: 79vw; 
 height: 100vh; 
 overflow: hidden; 
+font-family: 'Roboto', sans-serif; 
 }
 .main-content {
 flex: 1; 
@@ -334,21 +339,28 @@ margin: 0 auto;
 font-size: 15px;
 margin-bottom: 2px;
 text-align: left;
+font-family: 'Roboto', sans-serif; 
 }
 
 .overview-info {
-display: flex;
-flex-direction: row; 
-justify-content: space-between; 
-align-items: flex-start; 
-gap: 20px; 
-flex-wrap: nowrap; 
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center; /* Alinea todos los elementos en el centro vertical */
+  gap: 20px;
+  flex-wrap: nowrap; /* Evita que los elementos se vayan a una nueva línea */
 }
 
 .info {
 text-align: center;
 flex: 1; 
-min-width: 120px; 
+min-width: 0px; 
+}
+
+.info h3, .info h4, .info h5, .info h6 {
+  font-size: 15px;
+  margin: 0; /* Asegúrate de que no haya márgenes extra */
+  line-height: 1.5; /* Controla la altura de la línea para evitar saltos */
 }
 
 .info h3 {
@@ -377,6 +389,7 @@ font-size: 15px;
 color: rgb(255, 110, 14);
 margin-bottom: 10px;
 font-family: 'Roboto', sans-serif; 
+
 }
 
 .info p {

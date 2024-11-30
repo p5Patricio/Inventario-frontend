@@ -266,6 +266,7 @@ export default {
 <style scoped>
 /* Layout base */
 .layout {
+font-family: 'Roboto', sans-serif; 
   display: flex;
   height: 100vh; /* Altura fija del viewport */
   background-color: #ffffff;

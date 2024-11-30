@@ -75,6 +75,7 @@ export default {
   margin: 0 auto 10px; /* Centrado arriba del texto KANBAN */
 }
 .barra-lateral {
+font-family: 'Roboto', sans-serif; 
   width: 250px;
   height: 100vh;
   background: white;
