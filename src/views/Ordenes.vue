@@ -228,8 +228,12 @@ export default {
           },
         });
 
+        // Solo agrega a orders
         this.orders.push(response.data);
-        this.filteredOrders.push(response.data); 
+        
+        // Vuelve a aplicar el filtro
+        this.filterOrders();
+        
         this.resetForm();
         this.closeModal();
       } catch (error) {
