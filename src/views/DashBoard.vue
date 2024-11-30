@@ -3,49 +3,42 @@
     <Userbar />
     <BarraLateral />
     <div class="contenido-principal">
-      <h1>Pagina para el dashboard</h1>
+      <h1 class="dashboard-title">Dashboard</h1>
 
-      <!-- Sección de carga -->
-      <div v-if="loading">Cargando datos...</div>
-      
-      <!-- Secciones del dashboard -->
-      <div v-else>
-        <div class="overview-section">
+      <div class="dashboard-grid">
+        <!-- Sales Overview -->
+        <div class="dashboard-card">
           <h2>Sales Overview</h2>
-          <div class="overview-box">
-            <p>Total Tiendas: {{ totalTiendas }}</p>
-            <p>Número de Productos: {{ totalProductos }}</p>
-            <p>Total Precio de Compra: ₹{{ totalPrecioCompra }}</p>
-          </div>
+          <p>Total Tiendas: {{ totalTiendas }}</p>
+          <p>Número de Productos: {{ totalProductos }}</p>
+          <p>Total Precio de Compra: ₹{{ totalPrecioCompra }}</p>
         </div>
 
-        <div class="overview-section">
+        <!-- Inventory Summary -->
+        <div class="dashboard-card">
           <h2>Inventory Summary</h2>
-          <div class="overview-box">
-            <p>Total Cantidad: {{ totalCantidad }}</p>
-            <p>Órdenes Pendientes: {{ totalOrdenesPendientes }}</p>
-          </div>
+          <p>Total Cantidad: {{ totalCantidad }}</p>
+          <p>Órdenes Pendientes: {{ totalOrdenesPendientes }}</p>
         </div>
 
-        <div class="overview-section">
+        <!-- Purchase Overview -->
+        <div class="dashboard-card">
           <h2>Purchase Overview</h2>
-          <div class="overview-box">
-            <p>Total Órdenes: {{ totalOrdenes }}</p>
-            <p>Total Precio de Compra de Órdenes: ₹{{ totalPrecioOrdenes }}</p>
-            <p>Total Cantidad de Órdenes: {{ totalCantidadOrdenes }}</p>
-            <p>Categorías de Órdenes: {{ categoriasOrdenes }}</p>
-          </div>
+          <p>Total Órdenes: {{ totalOrdenes }}</p>
+          <p>Total Precio de Compra de Órdenes: ₹{{ totalPrecioOrdenes }}</p>
+          <p>Total Cantidad de Órdenes: {{ totalCantidadOrdenes }}</p>
+          <p>Categorías de Órdenes: {{ categoriasOrdenes }}</p>
         </div>
 
-        <div class="overview-section">
+        <!-- Product Summary -->
+        <div class="dashboard-card">
           <h2>Product Summary</h2>
-          <div class="overview-box">
-            <p>Total Proveedores: {{ totalProveedores }}</p>
-            <p>Categorías de Proveedores: {{ categoriasProveedores }}</p>
-          </div>
+          <p>Total Proveedores: {{ totalProveedores }}</p>
+          <p>Categorías de Proveedores: {{ categoriasProveedores }}</p>
         </div>
 
-        <div class="overview-section">
+        <!-- Top Selling Stock -->
+        <div class="dashboard-card">
           <h2>Top Selling Stock</h2>
           <ul>
             <li v-for="producto in topProductos" :key="producto.id">
@@ -54,7 +47,8 @@
           </ul>
         </div>
 
-        <div class="overview-section">
+        <!-- Low Quantity Stock -->
+        <div class="dashboard-card">
           <h2>Low Quantity Stock</h2>
           <ul>
             <li v-for="producto in lowStockProductos" :key="producto.id">
@@ -63,37 +57,46 @@
             </li>
           </ul>
         </div>
-      </div>
 
-      <!-- Gráfica -->
-      <div v-if="!chartData.labels.length || !chartData.datasets.length">
-        <p>Cargando datos de la gráfica...</p>
+        <!-- Sales & Purchase Graph -->
+        <div class="dashboard-card graph-box">
+          <h2>Sales & Purchase</h2>
+          <BarChart v-if="salesPurchaseData.labels.length" :chart-data="salesPurchaseData" />
+          <p v-else>Cargando datos de la gráfica de ventas y compras...</p>
+        </div>
+
+        <!-- Order Summary Graph -->
+        <div class="dashboard-card graph-box">
+          <h2>Order Summary</h2>
+          <LineChart v-if="orderSummaryData.labels.length" :chart-data="orderSummaryData" />
+          <p v-else>Cargando datos de la gráfica de resumen de órdenes...</p>
+        </div>
       </div>
-      <BarChart
-        v-else
-        :chart-data="JSON.parse(JSON.stringify(chartData))"
-      />
     </div>
   </div>
 </template>
-
-
 
 <script>
 import axios from "axios";
 import Userbar from "@/components/Userbar.vue";
 import BarraLateral from "@/components/BarraLateral.vue";
 import BarChart from "@/components/BarChart.vue";
+import LineChart from "@/components/LineChart.vue"; // Usaremos LineChart para "Order Summary"
 
 export default {
   components: {
     Userbar,
     BarraLateral,
     BarChart,
+    LineChart,
   },
   data() {
     return {
-      chartData: {
+      salesPurchaseData: {
+        labels: [],
+        datasets: [],
+      },
+      orderSummaryData: {
         labels: [],
         datasets: [],
       },
@@ -111,13 +114,12 @@ export default {
       categoriasProveedores: 0,
       topProductos: [],
       lowStockProductos: [],
-      backendUrl: 'http://localhost:3000',
+      backendUrl: "http://localhost:3000",
     };
   },
   methods: {
     async fetchData() {
       try {
-        // Realizamos las peticiones al backend
         const [productosRes, proveedoresRes, tiendasRes, ordenesRes] = await Promise.all([
           axios.get("productos/"),
           axios.get("proveedor/list"),
@@ -125,7 +127,6 @@ export default {
           axios.get("ordenes/list"),
         ]);
 
-        // Datos obtenidos de las respuestas
         const productos = productosRes.data;
         const proveedores = proveedoresRes.data;
         const tiendas = tiendasRes.data;
@@ -151,24 +152,21 @@ export default {
         this.categoriasProveedores = new Set(proveedores.map((prov) => prov.categoria)).size;
 
         // Top Selling Stock
-        this.topProductos = productos
-          .sort((a, b) => b.valorUmbral - a.valorUmbral)
-          .slice(0, 3);
+        this.topProductos = productos.sort((a, b) => b.valorUmbral - a.valorUmbral).slice(0, 3);
 
         // Low Quantity Stock
-        this.lowStockProductos = productos
-          .sort((a, b) => a.valorUmbral - b.valorUmbral)
-          .slice(0, 3);
+        this.lowStockProductos = productos.sort((a, b) => a.valorUmbral - b.valorUmbral).slice(0, 3);
 
-        // Datos para la gráfica
-        this.fetchChartData(productos, ordenes);
+        // Fetch data for graphs
+        this.fetchSalesPurchaseData(productos, ordenes);
+        await this.fetchOrderSummary();
 
         this.loading = false;
       } catch (error) {
         console.error("Error al cargar los datos:", error);
       }
     },
-    fetchChartData(productos, ordenes) {
+    fetchSalesPurchaseData(productos, ordenes) {
       const fechas = [...new Set([...productos.map((p) => p.fechadeventa), ...ordenes.map((o) => o.fechaEntrega)])];
 
       const productosPrecios = fechas.map((fecha) => {
@@ -181,7 +179,7 @@ export default {
         return orden ? orden.precioCompra : 0;
       });
 
-      this.chartData = {
+      this.salesPurchaseData = {
         labels: [...fechas],
         datasets: [
           {
@@ -201,8 +199,39 @@ export default {
         ],
       };
     },
+    async fetchOrderSummary() {
+      try {
+        const response = await axios.get(`${this.backendUrl}/api/ordenes/summary`);
+        const resumen = response.data;
+
+        this.orderSummaryData = {
+          labels: resumen.map((r) => r.fecha),
+          datasets: [
+            {
+              label: "Ordered",
+              data: resumen.map((r) => r.ordered),
+              backgroundColor: "rgba(255, 159, 64, 0.2)",
+              borderColor: "rgba(255, 159, 64, 1)",
+              borderWidth: 2,
+              tension: 0.4, // Líneas suaves
+              fill: true, // Relleno debajo de la línea
+            },
+            {
+              label: "Delivered",
+              data: resumen.map((r) => r.delivered),
+              backgroundColor: "rgba(54, 162, 235, 0.2)",
+              borderColor: "rgba(54, 162, 235, 1)",
+              borderWidth: 2,
+              tension: 0.4, // Líneas suaves
+              fill: true, // Relleno debajo de la línea
+            },
+          ],
+        };
+      } catch (error) {
+        console.error("Error al cargar el resumen de órdenes:", error);
+      }
+    },
     getFullImageUrl(imagePath) {
-      // Concatenar la URL base del backend con la ruta de la imagen
       return `${this.backendUrl}${imagePath}`;
     },
   },
@@ -213,28 +242,116 @@ export default {
 </script>
 
 <style scoped>
-.overview-section {
+.layout {
+  display: flex;
+  height: 100vh;
+}
+
+.contenido-principal {
+  flex: 1;
+  padding: 30px;
+  background-color: #f9f9f9;
+  overflow-y: auto;
+}
+
+.dashboard-title {
+  font-size: 28px;
   margin-bottom: 20px;
+  text-align: center;
+  color: #333;
+  font-weight: 600;
 }
-.overview-box {
+
+/* Estilo de la cuadrícula */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+/* Estilo de las tarjetas */
+.dashboard-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
   border: 1px solid #ddd;
-  padding: 10px;
-  border-radius: 5px;
 }
-.overview-box p {
+
+.dashboard-card h2 {
+  font-size: 18px;
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #333;
+}
+
+.dashboard-card p {
   margin: 5px 0;
+  font-size: 14px;
+  color: #555;
 }
+
 ul {
   list-style: none;
   padding: 0;
 }
+
 ul li {
-  margin-bottom: 10px;
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 8px;
 }
+
 ul li img {
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   margin-right: 10px;
   vertical-align: middle;
+  border-radius: 4px;
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Gráficas */
+.graph-box {
+  padding: 20px;
+}
+
+.graph-box h2 {
+  font-size: 16px;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.graph-box canvas {
+  margin-top: 10px;
+}
+
+/* Estilo responsivo */
+@media (max-width: 768px) {
+  .contenido-principal {
+    padding: 15px;
+  }
+
+  .dashboard-title {
+    font-size: 22px;
+  }
+
+  .dashboard-card {
+    padding: 15px;
+  }
+
+  .dashboard-card h2 {
+    font-size: 16px;
+  }
+
+  .dashboard-card p {
+    font-size: 13px;
+  }
+
+  ul li img {
+    width: 30px;
+    height: 30px;
+  }
 }
 </style>
