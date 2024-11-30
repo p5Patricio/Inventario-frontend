@@ -61,7 +61,7 @@
           </div>
           <table>
             <thead>
-              <tr>
+              <tr class="titulos">
                 <th>Product</th>
                 <th>Buying Price</th>
                 <th>Quantity</th>
@@ -76,6 +76,7 @@
                 :key="item.id"
                 @click="selectProduct(item)"
                 style="cursor: pointer;"
+                class="contenido"
               >
                 <td>{{ item.nombre }}</td>
                 <td>₹{{ item.precioCompra }}</td>
@@ -445,14 +446,26 @@ export default {
 /* Layout principal */
 .layout {
   display: flex;
-  min-height: 100vh;
+  min-height: 100vh; /* Ancho mayor que el predeterminado */
+  margin: 0 auto; /* Centra el contenido */
 }
 
+.main-content {
+  flex: 1;
+  padding: 20px;
+  max-width: 1200px; /* Aumentar el ancho máximo */
+  margin: 0 auto;
+}
+.overview, .orders {
+  max-width: 1200px; /* Aumenta el ancho */
+  margin: 0 auto; /* Centra los elementos */
+}
 /* Contenido principal */
 .contenido-principal {
   flex: 1;
   padding: 20px;
-  background-color: #f8f9fa; /* Fondo gris claro */
+  background-color: #efefef; /* Fondo gris claro */
+  font-family: 'Roboto', sans-serif; 
 }
 
 /* Barra de búsqueda y botones de acciones */
@@ -531,6 +544,7 @@ export default {
   display: flex;
   justify-content: space-between;
   margin-bottom: 20px;
+  width: 1135px;
 }
 
 .overview-card {
@@ -544,26 +558,31 @@ export default {
 }
 
 .overview-card h2 {
-  font-size: 18px;
+  font-size:large;
   font-weight: bold;
   margin-bottom: 10px;
+  font-family: 'Roboto', sans-serif; 
 }
 
 .overview-info {
   display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center; /* Alinea todos los elementos en el centro vertical */
   gap: 20px;
+  flex-wrap: nowrap; /* Evita que los elementos se vayan a una nueva línea */
 }
 
 .info {
   text-align: center;
+  flex: 1; /* Todos los contenedores ocupan un espacio igual */
+  min-width: 0; /* Permite que el contenedor se reduzca si es necesario */
 }
 
 .info h3, .info h4, .info h5, .info h6 {
-  font-size: 16px;
-  font-weight: bold;
-  margin-bottom: 5px;
+  font-size: 15px;
+  margin: 0; /* Asegúrate de que no haya márgenes extra */
+  line-height: 1.5; /* Controla la altura de la línea para evitar saltos */
 }
 
 .info p {
@@ -581,12 +600,17 @@ export default {
 .orders {
   margin-top: 20px;
 }
+.orders-card table {
+  width: 100%; /* Ocupa todo el ancho disponible */
+}
 
 .orders-card {
   background-color: #ffffff;
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-width: 1200px; /* Aumenta el ancho del contenedor */
+  margin: 0 auto;
 }
 
 .orders-card2 {
@@ -594,6 +618,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
+  font-family: 'Roboto', sans-serif; 
 }
 
 .orders-card h2 {
@@ -665,6 +690,13 @@ export default {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+.titulos {
+  font-family: 'Roboto', sans-serif; 
+}
+
+.contenido {
+  font-family: 'Roboto', sans-serif; 
+}
 .modal-title {
   font-size: 24px;
   font-weight: bold;
@@ -767,5 +799,83 @@ export default {
 
 .discard-btn:hover {
   background-color: #bbb;
+}
+
+/* Agregado de ordenes:  */
+.overview {
+margin-bottom: 20px;
+}
+
+
+.overview-card {
+padding: 20px;
+background-color: #ffffff;
+border-radius: 10px;
+box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+max-width: 1200px; 
+margin: 0 auto; 
+}
+
+.overview-card h2 {
+font-size: 15px;
+margin-bottom: 2px;
+text-align: left;
+}
+
+.overview-info {
+display: flex;
+flex-direction: row; 
+justify-content: space-between; 
+align-items: flex-start; 
+gap: 20px; 
+flex-wrap: nowrap; 
+}
+
+.info {
+text-align: center;
+flex: 1; 
+min-width: 120px; 
+}
+
+.info h3 {
+font-size: 15px;
+color: blue;
+margin-bottom: 10px;
+font-family: 'Roboto', sans-serif; 
+}
+.info h4 {
+font-size: 15px;
+color: orange;
+margin-bottom: 10px;
+font-family: 'Roboto', sans-serif; 
+
+}
+.info h5 {
+font-size: 15px;
+color: purple;
+margin-bottom: 10px;
+font-family: 'Roboto', sans-serif; 
+
+}
+
+.info h6 {
+font-size: 15px;
+color: rgb(255, 110, 14);
+margin-bottom: 10px;
+font-family: 'Roboto', sans-serif; 
+}
+
+.info p {
+font-size: 16px;
+font-weight: bold;
+color: #333;
+font-family: 'Roboto', sans-serif; 
+
+}
+
+.info span {
+font-size: 14px;
+color: #777;
+font-family: 'Roboto', sans-serif;
 }
 </style>

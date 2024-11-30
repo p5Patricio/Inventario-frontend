@@ -262,6 +262,7 @@ section {
   list-style-type: none;
   padding: 0;
   margin: 0;
+  align-items: center;
 }
 
 .best-selling-category li {
