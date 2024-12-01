@@ -120,16 +120,16 @@ export default {
       }
     },
     calculateOverview() {
-  this.totalProductPurchaseValue = this.products.reduce(
-    (sum, product) => sum + Number(product.precioCompra || 0),
-    0
-  );
-  this.totalOrdersValue = this.orders.reduce(
-    (sum, order) => sum + Number(order.valorOrden || 0),
-    0
-  );
-  this.profit = this.totalOrdersValue - this.totalProductPurchaseValue;
-},
+      this.totalProductPurchaseValue = this.products.reduce(
+        (sum, product) => sum + Number(product.precioCompra || 0),
+        0
+      );
+      this.totalOrdersValue = this.orders.reduce(
+        (sum, order) => sum + Number(order.valorOrden || 0),
+        0
+      );
+      this.profit = this.totalProductPurchaseValue - this.totalOrdersValue;
+    },
     getBestSellingCategories() {
       this.bestSellingCategories = [...this.products]
         .sort((a, b) => a.valorUmbral - b.valorUmbral)

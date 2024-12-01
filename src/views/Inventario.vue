@@ -11,7 +11,7 @@
         <div class="buscador">
           <input
             type="text"
-            placeholder="🔍 Search product, supplier, order"
+            placeholder="🔍 Search product"
             class="input-buscador"
             v-model="searchTerm"
             @input="filterProducts"
