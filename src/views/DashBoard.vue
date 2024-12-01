@@ -3,102 +3,73 @@
     <Userbar />
     <BarraLateral />
     <div class="contenido-principal">
-      <!-- Título del Dashboard -->
-      <div class="header">
-        <h1 class="dashboard-title">Dashboard</h1>
+      <!-- Barra de búsqueda -->
+      <div class="dashboard-header">
         <div class="search-bar">
           <input type="text" placeholder="Search product, supplier, order" />
         </div>
       </div>
 
-      <!-- Contenedor de las tarjetas y gráficos -->
+      <!-- Dashboard Grid -->
       <div class="dashboard-grid">
-        <!-- Sales Overview -->
-        <div class="dashboard-card overview-card">
-          <h2>Sales Overview</h2>
+        <!-- Primera fila -->
+        <div class="dashboard-card sales-overview">
+          <h2>📊 Sales Overview</h2>
           <div class="overview-content">
-            <p>₹ 832 <span>Sales</span></p>
-            <p>₹ 18,300 <span>Revenue</span></p>
-            <p>₹ 868 <span>Profit</span></p>
-            <p>₹ 17,432 <span>Cost</span></p>
+            <p><span class="icon">💰</span> Sales: ₹{{ totalTiendas }}</p>
+            <p><span class="icon">📈</span> Revenue: ₹{{ totalPrecioCompra }}</p>
+            <p><span class="icon">📉</span> Profit: ₹{{ totalProductos }}</p>
+            <p><span class="icon">📦</span> Cost: ₹{{ totalCantidad }}</p>
           </div>
         </div>
-
-        <!-- Purchase Overview -->
-        <div class="dashboard-card overview-card">
-          <h2>Purchase Overview</h2>
+        <div class="dashboard-card inventory-summary">
+          <h2>📦 Inventory Summary</h2>
           <div class="overview-content">
-            <p>82 <span>Purchase</span></p>
-            <p>₹ 13,573 <span>Cost</span></p>
-            <p>5 <span>Cancel</span></p>
-            <p>₹ 17,432 <span>Return</span></p>
+            <p><span class="icon">📦</span> Quantity in Hand: {{ totalCantidad }}</p>
+            <p><span class="icon">📥</span> To Be Received: {{ totalOrdenesPendientes }}</p>
           </div>
         </div>
-
-        <!-- Inventory Summary -->
-        <div class="dashboard-card overview-card">
-          <h2>Inventory Summary</h2>
+        <div class="dashboard-card purchase-overview">
+          <h2>🛒 Purchase Overview</h2>
           <div class="overview-content">
-            <p>868 <span>Quantity in Hand</span></p>
-            <p>200 <span>To be received</span></p>
+            <p><span class="icon">🛒</span> Purchases: {{ totalOrdenes }}</p>
+            <p><span class="icon">💵</span> Cost: ₹{{ totalPrecioOrdenes }}</p>
+            <p><span class="icon">🔄</span> Return: ₹{{ totalCantidadOrdenes }}</p>
           </div>
         </div>
-
-        <!-- Product Summary -->
-        <div class="dashboard-card overview-card">
-          <h2>Product Summary</h2>
+        <div class="dashboard-card product-summary">
+          <h2>🏷️ Product Summary</h2>
           <div class="overview-content">
-            <p>31 <span>Number of Suppliers</span></p>
-            <p>21 <span>Number of Categories</span></p>
+            <p><span class="icon">📦</span> Number of Suppliers: {{ totalProveedores }}</p>
+            <p><span class="icon">📋</span> Categories: {{ categoriasProveedores }}</p>
           </div>
         </div>
 
-        <!-- Sales & Purchase Graph -->
-        <div class="dashboard-card graph-box">
-          <div class="graph-header">
-            <h2>Sales & Purchase</h2>
-            <button class="toggle-view">Weekly</button>
-          </div>
-          <BarChart v-if="salesPurchaseData.labels.length" :chart-data="salesPurchaseData" />
+        <!-- Segunda fila -->
+        <div class="dashboard-card wide sales-purchase">
+          <h2>📊 Sales & Purchase</h2>
+          <BarChart v-if="chartData.labels.length" :chart-data="chartData" />
         </div>
-
-        <!-- Order Summary Graph -->
-        <div class="dashboard-card graph-box">
-          <h2>Order Summary</h2>
+        <div class="dashboard-card wide order-summary">
+          <h2>📋 Order Summary</h2>
           <LineChart v-if="orderSummaryData.labels.length" :chart-data="orderSummaryData" />
         </div>
 
-        <!-- Top Selling Stock -->
-        <div class="dashboard-card">
-          <h2>Top Selling Stock</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Sold Quantity</th>
-                <th>Remaining Quantity</th>
-                <th>Price</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="producto in topProductos" :key="producto.id">
-                <td>{{ producto.nombre }}</td>
-                <td>{{ producto.cantidadVendida }}</td>
-                <td>{{ producto.cantidadRestante }}</td>
-                <td>₹{{ producto.precio }}</td>
-              </tr>
-            </tbody>
-          </table>
+        <!-- Tercera fila -->
+        <div class="dashboard-card top-selling">
+          <h2>🏆 Top Selling Stock</h2>
+          <ul class="product-list">
+            <li v-for="producto in topProductos" :key="producto.id">
+              <span class="icon">🔥</span> {{ producto.nombre }} - ₹{{ producto.precioCompra }}
+            </li>
+          </ul>
         </div>
-
-        <!-- Low Quantity Stock -->
-        <div class="dashboard-card">
-          <h2>Low Quantity Stock</h2>
-          <ul>
+        <div class="dashboard-card low-stock">
+          <h2>⚠️ Low Quantity Stock</h2>
+          <ul class="product-list">
             <li v-for="producto in lowStockProductos" :key="producto.id">
               <img :src="getFullImageUrl(producto.imagenProducto)" alt="Imagen de producto" />
-              <span>{{ producto.nombre }}</span>
-              <span>Remaining Quantity: {{ producto.cantidad }}</span>
+              <span class="icon">⚠️</span> {{ producto.nombre }} - Cantidad: {{ producto.cantidad }}
             </li>
           </ul>
         </div>
@@ -112,7 +83,7 @@ import axios from "axios";
 import Userbar from "@/components/Userbar.vue";
 import BarraLateral from "@/components/BarraLateral.vue";
 import BarChart from "@/components/BarChart.vue";
-import LineChart from "@/components/LineChart.vue"; // Usaremos LineChart para "Order Summary"
+import LineChart from "@/components/LineChart.vue"; // Para la gráfica Order Summary
 
 export default {
   components: {
@@ -123,7 +94,7 @@ export default {
   },
   data() {
     return {
-      salesPurchaseData: {
+      chartData: {
         labels: [],
         datasets: [],
       },
@@ -151,6 +122,7 @@ export default {
   methods: {
     async fetchData() {
       try {
+        // Realizamos las peticiones al backend
         const [productosRes, proveedoresRes, tiendasRes, ordenesRes] = await Promise.all([
           axios.get("productos/"),
           axios.get("proveedor/list"),
@@ -158,6 +130,7 @@ export default {
           axios.get("ordenes/list"),
         ]);
 
+        // Datos obtenidos de las respuestas
         const productos = productosRes.data;
         const proveedores = proveedoresRes.data;
         const tiendas = tiendasRes.data;
@@ -183,21 +156,25 @@ export default {
         this.categoriasProveedores = new Set(proveedores.map((prov) => prov.categoria)).size;
 
         // Top Selling Stock
-        this.topProductos = productos.sort((a, b) => b.valorUmbral - a.valorUmbral).slice(0, 3);
+        this.topProductos = productos
+          .sort((a, b) => b.valorUmbral - a.valorUmbral)
+          .slice(0, 3);
 
         // Low Quantity Stock
-        this.lowStockProductos = productos.sort((a, b) => a.valorUmbral - b.valorUmbral).slice(0, 3);
+        this.lowStockProductos = productos
+          .sort((a, b) => a.valorUmbral - b.valorUmbral)
+          .slice(0, 3);
 
-        // Fetch data for graphs
-        this.fetchSalesPurchaseData(productos, ordenes);
-        await this.fetchOrderSummary();
+        // Datos para las gráficas
+        this.fetchChartData(productos, ordenes);
+        this.fetchOrderSummaryData(ordenes);
 
         this.loading = false;
       } catch (error) {
         console.error("Error al cargar los datos:", error);
       }
     },
-    fetchSalesPurchaseData(productos, ordenes) {
+    fetchChartData(productos, ordenes) {
       const fechas = [...new Set([...productos.map((p) => p.fechadeventa), ...ordenes.map((o) => o.fechaEntrega)])];
 
       const productosPrecios = fechas.map((fecha) => {
@@ -210,7 +187,7 @@ export default {
         return orden ? orden.precioCompra : 0;
       });
 
-      this.salesPurchaseData = {
+      this.chartData = {
         labels: [...fechas],
         datasets: [
           {
@@ -230,37 +207,34 @@ export default {
         ],
       };
     },
-    async fetchOrderSummary() {
-      try {
-        const response = await axios.get(`${this.backendUrl}/api/ordenes/summary`);
-        const resumen = response.data;
+    fetchOrderSummaryData(ordenes) {
+      const fechas = [...new Set(ordenes.map((o) => o.fechaEntrega))];
+      const orderedData = fechas.map((fecha) =>
+        ordenes.filter((o) => o.fechaEntrega === fecha).length
+      );
+      const deliveredData = fechas.map((fecha) =>
+        ordenes.filter((o) => o.estado === "Entregado" && o.fechaEntrega === fecha).length
+      );
 
-        this.orderSummaryData = {
-          labels: resumen.map((r) => r.fecha),
-          datasets: [
-            {
-              label: "Ordered",
-              data: resumen.map((r) => r.ordered),
-              backgroundColor: "rgba(255, 159, 64, 0.2)",
-              borderColor: "rgba(255, 159, 64, 1)",
-              borderWidth: 2,
-              tension: 0.4, // Líneas suaves
-              fill: true, // Relleno debajo de la línea
-            },
-            {
-              label: "Delivered",
-              data: resumen.map((r) => r.delivered),
-              backgroundColor: "rgba(54, 162, 235, 0.2)",
-              borderColor: "rgba(54, 162, 235, 1)",
-              borderWidth: 2,
-              tension: 0.4, // Líneas suaves
-              fill: true, // Relleno debajo de la línea
-            },
-          ],
-        };
-      } catch (error) {
-        console.error("Error al cargar el resumen de órdenes:", error);
-      }
+      this.orderSummaryData = {
+        labels: fechas,
+        datasets: [
+          {
+            label: "Ordered",
+            data: orderedData,
+            backgroundColor: "rgba(255, 159, 64, 0.2)",
+            borderColor: "rgba(255, 159, 64, 1)",
+            fill: true,
+          },
+          {
+            label: "Delivered",
+            data: deliveredData,
+            backgroundColor: "rgba(54, 162, 235, 0.2)",
+            borderColor: "rgba(54, 162, 235, 1)",
+            fill: true,
+          },
+        ],
+      };
     },
     getFullImageUrl(imagePath) {
       return `${this.backendUrl}${imagePath}`;
@@ -273,128 +247,144 @@ export default {
 </script>
 
 <style scoped>
+/* Layout general */
 .layout {
   display: flex;
   height: 100vh;
+  font-family: "Poppins", sans-serif;
+  background-color: #f8f9fa;
 }
 
 .contenido-principal {
   flex: 1;
   padding: 20px;
-  background-color: #f9f9f9;
+  background-color: #f9fafc;
+  overflow-y: auto;
 }
 
-.dashboard-title {
-  font-size: 28px;
-  margin-bottom: 20px;
-  text-align: center;
-  font-weight: 600;
-}
-
-.search-bar {
+/* Header */
+.dashboard-header {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
 }
 
 .search-bar input {
-  width: 60%;
   padding: 10px;
-  border: 1px solid #ddd;
+  width: 300px;
+  border: 1px solid #ccc;
   border-radius: 8px;
-  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s;
 }
 
+.search-bar input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+/* Grid */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(4, 1fr); /* 4 columnas por defecto */
   gap: 20px;
-}
-
-.dashboard-card {
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-}
-
-.overview-card h2 {
-  font-size: 18px;
-  margin-bottom: 15px;
-  font-weight: 600;
-}
-
-.overview-content p {
-  font-size: 14px;
-  margin: 5px 0;
-}
-
-.overview-content span {
-  color: #888;
-  font-size: 12px;
-  margin-left: 10px;
-}
-
-.graph-box {
-  padding: 15px;
-}
-
-.graph-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.graph-header h2 {
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.toggle-view {
-  background: transparent;
-  border: none;
-  color: #007bff;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-table {
   width: 100%;
-  border-collapse: collapse;
 }
 
-table th,
-table td {
-  text-align: left;
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
+/* Cards */
+.dashboard-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-table th {
-  background-color: #f8f8f8;
+.dashboard-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.dashboard-card h2 {
+  font-size: 20px;
+  font-weight: bold;
+  color: #34495e;
+  margin-bottom: 15px;
+}
+
+.dashboard-card.wide {
+  grid-column: span 2; /* Ocupar dos columnas */
+}
+
+/* Textos y contenidos */
+.overview-content p {
+  font-size: 16px;
+  margin: 5px 0;
   font-weight: 600;
+  color: #2d3a4b;
 }
 
-ul {
+.overview-content span.icon {
+  font-size: 18px;
+  margin-right: 8px;
+  color: #3498db;
+}
+
+/* Listas */
+.product-list {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
-ul li {
+.product-list li {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   margin-bottom: 10px;
 }
 
-ul li img {
+.product-list li img {
   width: 40px;
   height: 40px;
+  border-radius: 50%;
   margin-right: 10px;
-  border-radius: 5px;
 }
 
-ul li span {
-  font-size: 14px;
-  color: #333;
+.product-list li span.icon {
+  font-size: 16px;
+  margin-right: 8px;
+  color: #e74c3c;
+}
+
+/* Media Queries */
+@media (max-width: 1200px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 columnas en pantallas medianas */
+  }
+
+  .search-bar input {
+    width: 200px; /* Ajustar barra de búsqueda */
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr; /* 1 columna en pantallas pequeñas */
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .search-bar input {
+    width: 100%; /* Barra de búsqueda ocupa todo el ancho */
+  }
 }
 </style>
